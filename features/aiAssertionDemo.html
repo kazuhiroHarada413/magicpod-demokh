@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagicPod AI Assertion Demo</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .controls {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        button {
+            padding: 8px 12px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: #3498db;
+            color: white;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .content {
+            transition: all 0.3s ease;
+        }
+        
+        /* コントラスト設定 */
+        .normal-contrast {
+            color: #333;
+            background-color: #fff;
+        }
+        
+        .low-contrast {
+            color: #ddd;
+            background-color: #eee;
+        }
+        
+        /* テキストサイズ設定 */
+        .normal-text {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .tiny-text {
+            font-size: 6px;
+            line-height: 1.2;
+        }
+        
+        /* 画像フィルタ設定 */
+        .image-container {
+            margin: 20px 0;
+        }
+        
+        .image-normal {
+            filter: none;
+        }
+        
+        .image-grayscale {
+            filter: grayscale(100%);
+        }
+        
+        .image-sepia {
+            filter: sepia(100%);
+        }
+        
+        .active {
+            background-color: #16a085;
+        }
+        
+        h1 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body class="normal-contrast">
+    <div class="container">
+        <h1>MagicPod AI Assertion テストデモ</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <h3>コントラスト設定</h3>
+                <div>
+                    <button id="normal-contrast" class="active">通常コントラスト</button>
+                    <button id="low-contrast">低コントラスト</button>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>文字サイズ設定</h3>
+                <div>
+                    <button id="normal-text" class="active">通常サイズ</button>
+                    <button id="tiny-text">極小サイズ</button>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <h3>画像フィルタ設定</h3>
+                <div>
+                    <button id="image-normal" class="active">標準</button>
+                    <button id="image-grayscale">白黒</button>
+                    <button id="image-sepia">セピア</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content normal-text">
+            <h2>テストコンテンツ</h2>
+            <p>こちらはMagicPodのAIアサーション機能をテストするためのデモページです。このページでは、コントラスト、文字サイズ、画像フィルタの設定を変更することができます。</p>
+            
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse quis metus vitae urna vulputate commodo. Fusce egestas turpis eu libero faucibus, vel facilisis nibh imperdiet. Nulla facilisi. Etiam consectetur, nulla sit amet ultricies fringilla, ex sapien lacinia nunc, vel convallis est orci eu lacus.</p>
+            
+            <div class="image-container">
+                <img src="sample.png" alt="サンプル画像" id="sample-image" class="image-normal" width="100%" />
+            </div>
+            
+            <h3>アクセシビリティテスト</h3>
+            <p>アクセシビリティは、ウェブコンテンツをすべてのユーザーが利用できるようにするための重要な要素です。適切なコントラスト比や文字サイズは、視覚障害のあるユーザーにとって特に重要です。</p>
+            
+            <p>このデモページでは、異なるアクセシビリティレベルをシミュレートして、MagicPodのAIアサーション機能がどのように問題を検出するかを確認することができます。</p>
+            
+            <h3>テスト用ダミーテキスト</h3>
+            <p>吾輩は猫である。名前はまだ無い。どこで生れたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。吾輩はここで始めて人間というものを見た。</p>
+            
+            <p>しかしながら、私はこの世界の片隅に小さく生き、大きな夢を見ることを選びました。誰もが自分の物語を紡いでいく、そんな世界で生きていくのです。</p>
+        </div>
+    </div>
+    
+    <script>
+        // コントラスト切り替え
+        document.getElementById('normal-contrast').addEventListener('click', function() {
+            document.body.className = document.body.className.replace('low-contrast', 'normal-contrast');
+            setActiveButton('contrast', 'normal-contrast');
+        });
+        
+        document.getElementById('low-contrast').addEventListener('click', function() {
+            document.body.className = document.body.className.replace('normal-contrast', 'low-contrast');
+            setActiveButton('contrast', 'low-contrast');
+        });
+        
+        // 文字サイズ切り替え
+        document.getElementById('normal-text').addEventListener('click', function() {
+            document.querySelector('.content').className = document.querySelector('.content').className.replace('tiny-text', 'normal-text');
+            setActiveButton('text', 'normal-text');
+        });
+        
+        document.getElementById('tiny-text').addEventListener('click', function() {
+            document.querySelector('.content').className = document.querySelector('.content').className.replace('normal-text', 'tiny-text');
+            setActiveButton('text', 'tiny-text');
+        });
+        
+        // 画像フィルタ切り替え
+        document.getElementById('image-normal').addEventListener('click', function() {
+            const img = document.getElementById('sample-image');
+            img.className = 'image-normal';
+            setActiveButton('filter', 'image-normal');
+        });
+        
+        document.getElementById('image-grayscale').addEventListener('click', function() {
+            const img = document.getElementById('sample-image');
+            img.className = 'image-grayscale';
+            setActiveButton('filter', 'image-grayscale');
+        });
+        
+        document.getElementById('image-sepia').addEventListener('click', function() {
+            const img = document.getElementById('sample-image');
+            img.className = 'image-sepia';
+            setActiveButton('filter', 'image-sepia');
+        });
+        
+        // アクティブなボタンを設定する関数
+        function setActiveButton(group, activeId) {
+            let buttons;
+            
+            switch(group) {
+                case 'contrast':
+                    buttons = ['normal-contrast', 'low-contrast'];
+                    break;
+                case 'text':
+                    buttons = ['normal-text', 'tiny-text'];
+                    break;
+                case 'filter':
+                    buttons = ['image-normal', 'image-grayscale', 'image-sepia'];
+                    break;
+            }
+            
+            buttons.forEach(id => {
+                const button = document.getElementById(id);
+                if (id === activeId) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
