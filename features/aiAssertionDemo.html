@@ -90,6 +90,50 @@
             filter: sepia(100%);
         }
         
+        /* 色覚障害シミュレーション */
+        .vision-achroma {
+            filter: grayscale(100%);
+        }
+        
+        .vision-protanopia {
+            filter: url('data:image/svg+xml,\
+                <svg xmlns="http://www.w3.org/2000/svg">\
+                    <filter id="protanopia">\
+                        <feColorMatrix in="SourceGraphic" type="matrix"\
+                            values="0.567, 0.433, 0,     0, 0\
+                                    0.558, 0.442, 0,     0, 0\
+                                    0,     0.242, 0.758, 0, 0\
+                                    0,     0,     0,     1, 0"/>\
+                    </filter>\
+                </svg>#protanopia');
+        }
+        
+        .vision-deuteranopia {
+            filter: url('data:image/svg+xml,\
+                <svg xmlns="http://www.w3.org/2000/svg">\
+                    <filter id="deuteranopia">\
+                        <feColorMatrix in="SourceGraphic" type="matrix"\
+                            values="0.625, 0.375, 0,   0, 0\
+                                    0.7,   0.3,   0,   0, 0\
+                                    0,     0.3,   0.7, 0, 0\
+                                    0,     0,     0,   1, 0"/>\
+                    </filter>\
+                </svg>#deuteranopia');
+        }
+        
+        .vision-tritanopia {
+            filter: url('data:image/svg+xml,\
+                <svg xmlns="http://www.w3.org/2000/svg">\
+                    <filter id="tritanopia">\
+                        <feColorMatrix in="SourceGraphic" type="matrix"\
+                            values="0.95, 0.05,  0,     0, 0\
+                                    0,    0.433, 0.567, 0, 0\
+                                    0,    0.475, 0.525, 0, 0\
+                                    0,    0,     0,     1, 0"/>\
+                    </filter>\
+                </svg>#tritanopia');
+        }
+        
         .active {
             background-color: #16a085;
         }
@@ -137,7 +181,7 @@
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse quis metus vitae urna vulputate commodo. Fusce egestas turpis eu libero faucibus, vel facilisis nibh imperdiet. Nulla facilisi. Etiam consectetur, nulla sit amet ultricies fringilla, ex sapien lacinia nunc, vel convallis est orci eu lacus.</p>
             
             <div class="image-container">
-                <img src="sample.png" alt="サンプル画像" id="sample-image" class="image-normal" width="30%" />
+                <img src="sample.png" alt="サンプル画像" id="sample-image" class="image-normal" width="100%" />
             </div>
             
             <h3>アクセシビリティテスト</h3>
@@ -149,6 +193,159 @@
             <p>吾輩は猫である。名前はまだ無い。どこで生れたかとんと見当がつかぬ。何でも薄暗いじめじめした所でニャーニャー泣いていた事だけは記憶している。吾輩はここで始めて人間というものを見た。</p>
             
             <p>しかしながら、私はこの世界の片隅に小さく生き、大きな夢を見ることを選びました。誰もが自分の物語を紡いでいく、そんな世界で生きていくのです。</p>
+            
+            <div class="color-test-area">
+                <h3>色覚テスト用エリア</h3>
+                <p>以下の配色パターンを選択し、各色覚障害がある方の見え方をシミュレーションできます。</p>
+                
+                <div class="color-test-controls">
+                    <h4>配色パターン</h4>
+                    <div>
+                        <button id="color-accessible" class="active">アクセシブルな配色</button>
+                        <button id="color-problematic-protanopia">第1色盲で見づらい配色</button>
+                        <button id="color-problematic-deuteranopia">第2色盲で見づらい配色</button>
+                        <button id="color-problematic-tritanopia">第3色盲で見づらい配色</button>
+                    </div>
+                </div>
+                
+                <div class="color-test-controls">
+                    <h4>色覚シミュレーション</h4>
+                    <div>
+                        <button id="vision-normal" class="active">通常視覚</button>
+                        <button id="vision-achroma">全色盲</button>
+                        <button id="vision-protanopia">第1色盲</button>
+                        <button id="vision-deuteranopia">第2色盲</button>
+                        <button id="vision-tritanopia">第3色盲</button>
+                    </div>
+                </div>
+                
+                <div id="color-samples" class="accessible-colors">
+                    <!-- アクセシブルな配色 -->
+                    <div class="color-sample-set accessible-colors">
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
+                            <div style="width: 100px; height: 100px; background-color: #FF0000; display: flex; align-items: center; justify-content: center; color: white;">赤</div>
+                            <div style="width: 100px; height: 100px; background-color: #00FF00; display: flex; align-items: center; justify-content: center; color: black;">緑</div>
+                            <div style="width: 100px; height: 100px; background-color: #0000FF; display: flex; align-items: center; justify-content: center; color: white;">青</div>
+                            <div style="width: 100px; height: 100px; background-color: #FF00FF; display: flex; align-items: center; justify-content: center; color: white;">マゼンタ</div>
+                            <div style="width: 100px; height: 100px; background-color: #FFFF00; display: flex; align-items: center; justify-content: center; color: black;">黄色</div>
+                            <div style="width: 100px; height: 100px; background-color: #00FFFF; display: flex; align-items: center; justify-content: center; color: black;">シアン</div>
+                        </div>
+                        
+                        <div class="example-ui">
+                            <h4>アクセシブルなUI例</h4>
+                            <div class="ui-example">
+                                <div style="background-color: #000000; color: #FFFFFF; padding: 10px; border-radius: 4px; width: fit-content;">黒背景に白文字（高コントラスト）</div>
+                                <div style="margin-top: 10px; background-color: #003366; color: #FFFFFF; padding: 10px; border-radius: 4px; width: fit-content;">濃い青背景に白文字</div>
+                                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                    <button style="background-color: #0066CC; color: white; padding: 8px 12px; border: none; border-radius: 4px;">青ボタン</button>
+                                    <button style="background-color: #CC0000; color: white; padding: 8px 12px; border: none; border-radius: 4px;">赤ボタン</button>
+                                    <button style="background-color: #006600; color: white; padding: 8px 12px; border: none; border-radius: 4px;">緑ボタン</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第1色盲（赤色覚異常）で見づらい配色 -->
+                    <div class="color-sample-set problematic-protanopia" style="display: none;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
+                            <div style="width: 100px; height: 100px; background-color: #FF0000; display: flex; align-items: center; justify-content: center; color: white;">赤</div>
+                            <div style="width: 100px; height: 100px; background-color: #00AA00; display: flex; align-items: center; justify-content: center; color: white;">緑</div>
+                            <div style="width: 100px; height: 100px; background-color: #005500; display: flex; align-items: center; justify-content: center; color: white;">暗い緑</div>
+                            <div style="width: 100px; height: 100px; background-color: #AA0000; display: flex; align-items: center; justify-content: center; color: white;">暗い赤</div>
+                        </div>
+                        
+                        <div class="example-ui">
+                            <h4>第1色盲で見づらいUI例</h4>
+                            <div class="ui-example">
+                                <div style="background-color: #00AA00; color: #CC0000; padding: 10px; border-radius: 4px; width: fit-content;">緑背景に赤文字（極めて見づらい）</div>
+                                <div style="margin-top: 10px; background-color: #FFDDDD; color: #006600; padding: 10px; border-radius: 4px; width: fit-content; font-size: 14px;">薄い赤背景に緑文字（識別困難）</div>
+                                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                    <button style="background-color: #FF0000; color: white; padding: 8px 12px; border: none; border-radius: 4px;">OK</button>
+                                    <button style="background-color: #008800; color: white; padding: 8px 12px; border: none; border-radius: 4px;">NG</button>
+                                </div>
+                                <div style="margin-top: 10px; border: 2px solid #FF0000; padding: 10px; border-radius: 4px;">
+                                    <p style="margin: 0; color: #008800; font-size: 13px;">赤枠内の緑テキスト（境界が見づらく重要性が伝わらない）</p>
+                                </div>
+                                <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                                    <span style="color: #BB0000; font-weight: bold;">重要な警告メッセージ</span>
+                                    <span style="color: #008800; font-weight: bold;">通常のお知らせ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第2色盲（緑色覚異常）で見づらい配色 -->
+                    <div class="color-sample-set problematic-deuteranopia" style="display: none;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
+                            <div style="width: 100px; height: 100px; background-color: #FF8800; display: flex; align-items: center; justify-content: center; color: black;">オレンジ</div>
+                            <div style="width: 100px; height: 100px; background-color: #008800; display: flex; align-items: center; justify-content: center; color: white;">緑</div>
+                            <div style="width: 100px; height: 100px; background-color: #DDCC00; display: flex; align-items: center; justify-content: center; color: black;">黄色</div>
+                            <div style="width: 100px; height: 100px; background-color: #996600; display: flex; align-items: center; justify-content: center; color: white;">茶色</div>
+                        </div>
+                        
+                        <div class="example-ui">
+                            <h4>第2色盲で見づらいUI例</h4>
+                            <div class="ui-example">
+                                <div style="background-color: #DDFFDD; color: #993300; padding: 10px; border-radius: 4px; width: fit-content; font-size: 14px;">薄緑背景に茶色文字（見分けにくい）</div>
+                                <div style="margin-top: 10px;">
+                                    <span style="color: #006600; font-weight: bold;">緑色の重要テキスト</span> と <span style="color: #993300; font-weight: bold;">茶色の警告テキスト</span>
+                                    <div style="font-size: 13px; margin-top: 5px; color: #555;">※第2色盲の方には同系統の色に見えます</div>
+                                </div>
+                                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                    <button style="background-color: #DDCC00; color: black; padding: 8px 12px; border: none; border-radius: 4px;">黄色ボタン</button>
+                                    <button style="background-color: #006600; color: white; padding: 8px 12px; border: none; border-radius: 4px;">緑ボタン</button>
+                                </div>
+                                <div style="margin-top: 15px; border: 1px solid #ccc; padding: 10px; border-radius: 4px;">
+                                    <div style="margin-bottom: 5px; font-weight: bold;">ステータス凡例（色だけで区別）:</div>
+                                    <div style="display: flex; gap: 5px; align-items: center;">
+                                        <div style="width: 20px; height: 20px; background-color: #996600;"></div> 完了
+                                    </div>
+                                    <div style="display: flex; gap: 5px; align-items: center; margin-top: 5px;">
+                                        <div style="width: 20px; height: 20px; background-color: #006600;"></div> 未完了
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 第3色盲（青色覚異常）で見づらい配色 -->
+                    <div class="color-sample-set problematic-tritanopia" style="display: none;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
+                            <div style="width: 100px; height: 100px; background-color: #0000FF; display: flex; align-items: center; justify-content: center; color: white;">青</div>
+                            <div style="width: 100px; height: 100px; background-color: #FFFF00; display: flex; align-items: center; justify-content: center; color: black;">黄色</div>
+                            <div style="width: 100px; height: 100px; background-color: #00CCFF; display: flex; align-items: center; justify-content: center; color: black;">水色</div>
+                            <div style="width: 100px; height: 100px; background-color: #9900CC; display: flex; align-items: center; justify-content: center; color: white;">紫</div>
+                        </div>
+                        
+                        <div class="example-ui">
+                            <h4>第3色盲で見づらいUI例</h4>
+                            <div class="ui-example">
+                                <div style="background-color: #AADDFF; color: #0000AA; padding: 10px; border-radius: 4px; width: fit-content; font-size: 14px;">水色背景に青文字（識別困難）</div>
+                                <div style="margin-top: 10px; background-color: #FFFFAA; color: #000088; padding: 10px; border-radius: 4px; width: fit-content; font-size: 13px;">薄黄色背景に青文字（区別しづらい）</div>
+                                <div style="margin-top: 10px; display: flex; gap: 10px;">
+                                    <button style="background-color: #0066FF; color: white; padding: 8px 12px; border: none; border-radius: 4px;">青ボタン</button>
+                                    <button style="background-color: #8800CC; color: white; padding: 8px 12px; border: none; border-radius: 4px;">紫ボタン</button>
+                                </div>
+                                <div style="margin-top: 15px; border: 1px solid #ccc; padding: 10px; border-radius: 4px;">
+                                    <div style="margin-bottom: 5px; font-weight: bold;">プラン種別（色のみで区別）:</div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                        <div style="display: flex; align-items: center; gap: 5px;">
+                                            <div style="width: 20px; height: 20px; background-color: #00AAFF;"></div> 基本プラン
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 5px; margin-left: 10px;">
+                                            <div style="width: 20px; height: 20px; background-color: #0000AA;"></div> プレミアムプラン
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 10px; font-size: 13px; font-weight: bold; color: #0066FF;">
+                                        この青色のテキストは重要な情報です
+                                        <span style="display: block; font-size: 11px; color: #555; font-weight: normal;">※第3色盲の方には識別しにくい色です</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -194,6 +391,67 @@
             setActiveButton('filter', 'image-sepia');
         });
         
+        // 色覚障害シミュレーション
+        document.getElementById('vision-normal').addEventListener('click', function() {
+            document.getElementById('color-samples').style.filter = 'none';
+            setActiveButton('vision', 'vision-normal');
+        });
+        
+        document.getElementById('vision-achroma').addEventListener('click', function() {
+            document.getElementById('color-samples').style.filter = 'grayscale(100%)';
+            setActiveButton('vision', 'vision-achroma');
+        });
+        
+        document.getElementById('vision-protanopia').addEventListener('click', function() {
+            document.getElementById('color-samples').style.filter = 'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="protanopia"><feColorMatrix in="SourceGraphic" type="matrix" values="0.567, 0.433, 0, 0, 0 0.558, 0.442, 0, 0, 0 0, 0.242, 0.758, 0, 0 0, 0, 0, 1, 0"/></filter></svg>#protanopia\')';
+            setActiveButton('vision', 'vision-protanopia');
+        });
+        
+        document.getElementById('vision-deuteranopia').addEventListener('click', function() {
+            document.getElementById('color-samples').style.filter = 'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="deuteranopia"><feColorMatrix in="SourceGraphic" type="matrix" values="0.625, 0.375, 0, 0, 0 0.7, 0.3, 0, 0, 0 0, 0.3, 0.7, 0, 0 0, 0, 0, 1, 0"/></filter></svg>#deuteranopia\')';
+            setActiveButton('vision', 'vision-deuteranopia');
+        });
+        
+        document.getElementById('vision-tritanopia').addEventListener('click', function() {
+            document.getElementById('color-samples').style.filter = 'url(\'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"><filter id="tritanopia"><feColorMatrix in="SourceGraphic" type="matrix" values="0.95, 0.05, 0, 0, 0 0, 0.433, 0.567, 0, 0 0, 0.475, 0.525, 0, 0 0, 0, 0, 1, 0"/></filter></svg>#tritanopia\')';
+            setActiveButton('vision', 'vision-tritanopia');
+        });
+        
+        // 色覚テスト配色パターン切り替え
+        document.getElementById('color-accessible').addEventListener('click', function() {
+            showColorSet('accessible-colors');
+            setActiveButton('color-scheme', 'color-accessible');
+        });
+        
+        document.getElementById('color-problematic-protanopia').addEventListener('click', function() {
+            showColorSet('problematic-protanopia');
+            setActiveButton('color-scheme', 'color-problematic-protanopia');
+        });
+        
+        document.getElementById('color-problematic-deuteranopia').addEventListener('click', function() {
+            showColorSet('problematic-deuteranopia');
+            setActiveButton('color-scheme', 'color-problematic-deuteranopia');
+        });
+        
+        document.getElementById('color-problematic-tritanopia').addEventListener('click', function() {
+            showColorSet('problematic-tritanopia');
+            setActiveButton('color-scheme', 'color-problematic-tritanopia');
+        });
+        
+        function showColorSet(className) {
+            // すべての色サンプルセットを非表示
+            const allSets = document.querySelectorAll('.color-sample-set');
+            allSets.forEach(set => {
+                set.style.display = 'none';
+            });
+            
+            // 選択したセットのみ表示
+            const selectedSet = document.querySelector('.' + className);
+            if (selectedSet) {
+                selectedSet.style.display = 'block';
+            }
+        }
+        
         // アクティブなボタンを設定する関数
         function setActiveButton(group, activeId) {
             let buttons;
@@ -207,6 +465,12 @@
                     break;
                 case 'filter':
                     buttons = ['image-normal', 'image-grayscale', 'image-sepia'];
+                    break;
+                case 'vision':
+                    buttons = ['vision-normal', 'vision-achroma', 'vision-protanopia', 'vision-deuteranopia', 'vision-tritanopia'];
+                    break;
+                case 'color-scheme':
+                    buttons = ['color-accessible', 'color-problematic-protanopia', 'color-problematic-deuteranopia', 'color-problematic-tritanopia'];
                     break;
             }
             
