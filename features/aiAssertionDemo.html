@@ -198,15 +198,15 @@
                 <h3>色覚テスト用エリア</h3>
                 <p>以下の配色パターンを選択し、各色覚障害がある方の見え方をシミュレーションできます。</p>
                 
-                <div class="color-test-controls">
-                    <h4>配色パターン</h4>
-                    <div>
-                        <button id="accessible-colors" class="active">リセット</button>
-                        <button id="color-problematic-protanopia">第1色盲で見づらい配色</button>
-                        <button id="color-problematic-deuteranopia">第2色盲で見づらい配色</button>
-                        <button id="color-problematic-tritanopia">第3色盲で見づらい配色</button>
-                    </div>
+            <div class="color-test-controls">
+                <h4>配色パターン</h4>
+                <div>
+                  <button id="color-accessible" class="active">リセット</button>
+                  <button id="color-problematic-protanopia">第1色盲で見づらい配色</button>
+                  <button id="color-problematic-deuteranopia">第2色盲で見づらい配色</button>
+                  <button id="color-problematic-tritanopia">第3色盲で見づらい配色</button>
                 </div>
+            </div>
                 
                 <div class="color-test-controls">
                     <h4>色覚シミュレーション</h4>
@@ -219,7 +219,7 @@
                     </div>
                 </div>
                 
-                <div id="color-samples" class="accessible-colors">
+                <div id="color-samples">
                     <!-- アクセシブルな配色 -->
                     <div class="color-sample-set accessible-colors">
                         <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
@@ -350,6 +350,22 @@
     </div>
     
     <script>
+        // 初期表示時にアクセシブル配色セットを表示
+        window.addEventListener('DOMContentLoaded', function() {
+            // すべての配色セットを一度非表示
+            document.querySelectorAll('.color-sample-set').forEach(function(set) {
+                set.style.display = 'none';
+            });
+            
+            // アクセシブル配色セットのみ表示
+            document.querySelectorAll('.accessible-colors').forEach(function(set) {
+                set.style.display = 'block';
+            });
+            
+            // アクセシブル配色ボタンをアクティブに
+            setActiveButton('color-scheme', 'color-accessible');
+        });
+        
         // コントラスト切り替え
         document.getElementById('normal-contrast').addEventListener('click', function() {
             document.body.className = document.body.className.replace('low-contrast', 'normal-contrast');
@@ -440,17 +456,20 @@
         
         function showColorSet(className) {
             // すべての色サンプルセットを非表示
-            const allSets = document.querySelectorAll('.color-sample-set');
-            allSets.forEach(set => {
+            document.querySelectorAll('.color-sample-set').forEach(set => {
                 set.style.display = 'none';
             });
             
             // 選択したセットのみ表示
-            const selectedSet = document.querySelector('.' + className);
-            if (selectedSet) {
-                selectedSet.style.display = 'block';
-            }
+            document.querySelectorAll('.' + className).forEach(set => {
+                set.style.display = 'block';
+            });
         }
+        
+        // ページ読み込み時にアクセシブル配色を表示
+        window.addEventListener('load', function() {
+            showColorSet('accessible-colors');
+        });
         
         // アクティブなボタンを設定する関数
         function setActiveButton(group, activeId) {
