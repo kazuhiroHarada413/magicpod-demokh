@@ -159,16 +159,23 @@
 
         <div id="result"></div>
 
-        <div class="dev-info">
+        <div class="dev-info" id="dev-info" style="display: none;">
             <strong>開発者向け情報:</strong><br>
             ローディング要素のid: loading<br>
             結果表示要素のid: result<br>
-            待ち時間: 1〜4秒（ランダム）<br>
+            待ち時間: 8〜12秒（ランダム）<br>
             ヒント: 「要素が表示されるまで待機」コマンドを使用してください
         </div>
     </div>
 
     <script>
+        // クエリパラメータで開発者情報の表示を制御
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('dev') === 'true') {
+                document.getElementById('dev-info').style.display = 'block';
+            }
+        });
         function searchInventory() {
             // 1. 入力値を取得
             const productCode = document.getElementById('product-code').value.trim();

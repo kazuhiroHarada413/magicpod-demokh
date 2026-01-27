@@ -124,7 +124,7 @@
 
         <div id="result-message"></div>
 
-        <div class="dev-info">
+        <div class="dev-info" id="dev-info" style="display: none;">
             <strong>開発者向け情報:</strong><br>
             現在のボタンテキスト: <span id="current-button-text"></span><br>
             ボタンのid: submit-btn（固定）<br>
@@ -146,6 +146,12 @@
 
             // 開発者向け情報を更新
             document.getElementById('current-button-text').textContent = randomText;
+
+            // クエリパラメータで開発者情報の表示を制御
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('dev') === 'true') {
+                document.getElementById('dev-info').style.display = 'block';
+            }
 
             // コンソールログ出力
             console.log('ボタンテキストが設定されました:', randomText);

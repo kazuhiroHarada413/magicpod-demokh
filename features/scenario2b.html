@@ -170,7 +170,7 @@
 
         <div id="result"></div>
 
-        <div class="dev-info">
+        <div class="dev-info" id="dev-info" style="display: none;">
             <strong>開発者向け情報:</strong><br>
             都道府県ドロップダウンid: prefecture<br>
             市区町村ドロップダウンid: city<br>
@@ -184,6 +184,14 @@
     </div>
 
     <script>
+        // クエリパラメータで開発者情報の表示を制御
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('dev') === 'true') {
+                document.getElementById('dev-info').style.display = 'block';
+            }
+        });
+
         let prefecturesLoaded = false; // 読み込み済みフラグ
 
         // 都道府県ドロップダウンクリック時（フォーカス時）

@@ -310,7 +310,7 @@
             </div>
         </div>
 
-        <div class="test-hint">
+        <div class="test-hint" id="test-hint" style="display: none;">
             <strong>🧪 テストケース作成のヒント:</strong><br><br>
             このページでは、画面に表示されているポイント数値を変数に保存し、<br>
             四則演算で合計を検証するテストケースを作成してみましょう。<br><br>
@@ -326,7 +326,7 @@
             </div>
         </div>
 
-        <div class="dev-info">
+        <div class="dev-info" id="dev-info" style="display: none;">
             <strong>開発者向け情報:</strong><br>
             現在のポイント数値id: current-display（例: "1,500"）<br>
             今回獲得ポイント数値id: earned-display（例: "300"）<br>
@@ -405,6 +405,13 @@
             console.log('=== ページロード完了 ===');
             console.log('初期ポイントデータ:', pointData);
             updateDisplay();
+
+            // クエリパラメータで開発者情報の表示を制御
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('dev') === 'true') {
+                document.getElementById('test-hint').style.display = 'block';
+                document.getElementById('dev-info').style.display = 'block';
+            }
         });
     </script>
 </body>

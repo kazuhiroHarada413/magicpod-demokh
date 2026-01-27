@@ -227,7 +227,7 @@
         <h1>お客様アンケート</h1>
         <p class="description">サービス向上のため、アンケートへのご協力をお願いします。</p>
 
-        <div class="debug-panel">
+        <div class="debug-panel" id="debug-panel" style="display: none;">
             <strong>🔧 テスト用ボタン</strong><br>
             <button onclick="resetCookieBanner()" class="btn-debug">
                 クッキーバナーを再表示
@@ -295,7 +295,7 @@
                 </div>
             </div>
 
-            <div class="dev-info" style="margin-top: 20px; margin-bottom: 30px;">
+            <div class="dev-info" id="dev-info" style="display: none; margin-top: 20px; margin-bottom: 30px;">
                 <strong>開発者向け情報:</strong><br>
                 送信ボタンid: submit-btn<br>
                 クッキーバナーid: cookie-banner<br>
@@ -343,6 +343,13 @@
         // ページロード時のクッキーバナー表示制御
         window.addEventListener('DOMContentLoaded', function() {
             console.log('=== ページロード完了 ===');
+
+            // クエリパラメータで開発者情報の表示を制御
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('dev') === 'true') {
+                document.getElementById('debug-panel').style.display = 'block';
+                document.getElementById('dev-info').style.display = 'block';
+            }
 
             // 以前に同意済みかチェック
             const cookiesAccepted = localStorage.getItem('cookiesAccepted');
