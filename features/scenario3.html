@@ -78,23 +78,48 @@
             font-size: 14px;
         }
 
-        .point-value {
+        .point-value-container {
+            display: flex;
+            align-items: baseline;
+            gap: 2px;
+        }
+
+        .point-sign {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .point-sign.positive {
+            color: #28a745;
+        }
+
+        .point-sign.negative {
+            color: #dc3545;
+        }
+
+        .point-number {
             font-size: 18px;
             font-weight: bold;
             color: #333;
         }
 
-        .point-value.positive {
+        .point-number.positive {
             color: #28a745;
         }
 
-        .point-value.negative {
+        .point-number.negative {
             color: #dc3545;
         }
 
-        .point-value.total {
+        .point-number.total {
             color: #007bff;
             font-size: 24px;
+        }
+
+        .point-unit {
+            font-size: 14px;
+            color: #666;
+            margin-left: 2px;
         }
 
         .btn-refresh {
@@ -193,6 +218,17 @@
             margin-top: 10px;
             overflow-x: auto;
         }
+
+        .total-row {
+            background-color: #e7f3ff;
+            margin: 10px -20px -20px;
+            padding: 15px 20px;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .total-row .point-label {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -208,23 +244,41 @@
         <div class="point-details">
             <div class="point-row">
                 <span class="point-label">現在のポイント</span>
-                <span class="point-value" id="current-display">1,500pt</span>
+                <div class="point-value-container">
+                    <span class="point-number" id="current-display">1,500</span>
+                    <span class="point-unit">pt</span>
+                </div>
             </div>
             <div class="point-row">
                 <span class="point-label">今回獲得ポイント</span>
-                <span class="point-value positive" id="earned-display">+300pt</span>
+                <div class="point-value-container">
+                    <span class="point-sign positive" id="earned-sign">+</span>
+                    <span class="point-number positive" id="earned-display">300</span>
+                    <span class="point-unit">pt</span>
+                </div>
             </div>
             <div class="point-row">
                 <span class="point-label">キャンペーンボーナス</span>
-                <span class="point-value positive" id="bonus-display">+150pt</span>
+                <div class="point-value-container">
+                    <span class="point-sign positive" id="bonus-sign">+</span>
+                    <span class="point-number positive" id="bonus-display">150</span>
+                    <span class="point-unit">pt</span>
+                </div>
             </div>
             <div class="point-row">
                 <span class="point-label">有効期限切れ予定</span>
-                <span class="point-value negative" id="expired-display">-200pt</span>
+                <div class="point-value-container">
+                    <span class="point-sign negative" id="expired-sign">-</span>
+                    <span class="point-number negative" id="expired-display">200</span>
+                    <span class="point-unit">pt</span>
+                </div>
             </div>
-            <div class="point-row" style="background-color: #e7f3ff; margin: 10px -20px -20px; padding: 15px 20px; border-radius: 0 0 8px 8px;">
-                <span class="point-label" style="font-weight: bold;">合計ポイント（予定）</span>
-                <span class="point-value total" id="total-display">1,750pt</span>
+            <div class="point-row total-row">
+                <span class="point-label">合計ポイント（予定）</span>
+                <div class="point-value-container">
+                    <span class="point-number total" id="total-display">1,750</span>
+                    <span class="point-unit">pt</span>
+                </div>
             </div>
         </div>
 
@@ -258,38 +312,38 @@
 
         <div class="test-hint">
             <strong>🧪 テストケース作成のヒント:</strong><br><br>
-            このページでは、画面に表示されているポイントを変数に保存し、<br>
+            このページでは、画面に表示されているポイント数値を変数に保存し、<br>
             四則演算で合計を検証するテストケースを作成してみましょう。<br><br>
 
             <strong>想定されるテストケース:</strong>
             <div class="code-example">
-1. 「現在のポイント」を変数Aに保存<br>
-2. 「今回獲得ポイント」を変数Bに保存<br>
-3. 「キャンペーンボーナス」を変数Cに保存<br>
-4. 「有効期限切れ予定」を変数Dに保存<br>
-5. 四則演算: A + B + C + D = 計算結果<br>
+1. 「現在のポイント」の数値部分を変数Aに保存<br>
+2. 「今回獲得ポイント」の数値部分を変数Bに保存<br>
+3. 「キャンペーンボーナス」の数値部分を変数Cに保存<br>
+4. 「有効期限切れ予定」の数値部分を変数Dに保存<br>
+5. 四則演算: A + B + C - D = 計算結果<br>
 6. 「合計ポイント」が計算結果と一致することを確認
             </div>
         </div>
 
         <div class="dev-info">
             <strong>開発者向け情報:</strong><br>
-            現在のポイント表示id: current-display<br>
-            今回獲得ポイント表示id: earned-display<br>
-            キャンペーンボーナス表示id: bonus-display<br>
-            有効期限切れ予定表示id: expired-display<br>
-            合計ポイント表示id: total-display<br>
+            現在のポイント数値id: current-display（例: "1,500"）<br>
+            今回獲得ポイント数値id: earned-display（例: "300"）<br>
+            キャンペーンボーナス数値id: bonus-display（例: "150"）<br>
+            有効期限切れ予定数値id: expired-display（例: "200"）<br>
+            合計ポイント数値id: total-display（例: "1,750"）<br>
             <br>
             <strong class="warning-text">⚠ このページのテストで起きる問題:</strong><br>
-            画面から取得した値には「カンマ」「pt」「+」「-」が含まれています。<br>
+            数値部分だけを取得しても「カンマ」が含まれています。<br>
             そのまま四則演算コマンドで計算しようとするとエラーになります。<br>
             <br>
             <strong>例:</strong><br>
-            取得値: "1,500pt" → 数値として扱えない<br>
-            取得値: "+300pt" → 数値として扱えない<br>
+            取得値: "1,500" → カンマがあるため数値として扱えない<br>
+            期待: 1500 + 300 + 150 - 200 = 1750<br>
             <br>
             <strong>解決方法:</strong><br>
-            1. 数値部分のみを抽出してから計算する<br>
+            1. カンマを除去してから計算する<br>
             2. または、計算せずに画面の「合計ポイント」を直接検証する
         </div>
     </div>
@@ -300,38 +354,33 @@
             current: 1500,
             earned: 300,
             bonus: 150,
-            expired: -200
+            expired: 200  // 内部では正の数で保持（表示時にマイナス扱い）
         };
 
-        // 数値をフォーマットして表示用文字列に変換
-        function formatPoints(value, showSign = false) {
-            const absValue = Math.abs(value);
-            const formatted = absValue.toLocaleString('ja-JP');
-
-            if (showSign) {
-                return value >= 0 ? `+${formatted}pt` : `-${formatted}pt`;
-            }
-            return `${formatted}pt`;
+        // 数値をカンマ区切りでフォーマット
+        function formatNumber(value) {
+            return value.toLocaleString('ja-JP');
         }
 
         // 画面を更新
         function updateDisplay() {
-            const total = pointData.current + pointData.earned + pointData.bonus + pointData.expired;
+            const total = pointData.current + pointData.earned + pointData.bonus - pointData.expired;
 
-            document.getElementById('current-points').textContent = formatPoints(pointData.current);
-            document.getElementById('current-display').textContent = formatPoints(pointData.current);
-            document.getElementById('earned-display').textContent = formatPoints(pointData.earned, true);
-            document.getElementById('bonus-display').textContent = formatPoints(pointData.bonus, true);
-            document.getElementById('expired-display').textContent = formatPoints(pointData.expired, true);
-            document.getElementById('total-display').textContent = formatPoints(total);
+            document.getElementById('current-points').textContent = formatNumber(pointData.current) + 'pt';
+            document.getElementById('current-display').textContent = formatNumber(pointData.current);
+            document.getElementById('earned-display').textContent = formatNumber(pointData.earned);
+            document.getElementById('bonus-display').textContent = formatNumber(pointData.bonus);
+            document.getElementById('expired-display').textContent = formatNumber(pointData.expired);
+            document.getElementById('total-display').textContent = formatNumber(total);
 
             console.log('=== ポイント表示更新 ===');
-            console.log('現在のポイント:', pointData.current, '→ 表示:', formatPoints(pointData.current));
-            console.log('今回獲得:', pointData.earned, '→ 表示:', formatPoints(pointData.earned, true));
-            console.log('ボーナス:', pointData.bonus, '→ 表示:', formatPoints(pointData.bonus, true));
-            console.log('期限切れ:', pointData.expired, '→ 表示:', formatPoints(pointData.expired, true));
-            console.log('合計:', total, '→ 表示:', formatPoints(total));
+            console.log('現在のポイント:', pointData.current, '→ 表示:', formatNumber(pointData.current));
+            console.log('今回獲得:', pointData.earned, '→ 表示:', formatNumber(pointData.earned));
+            console.log('ボーナス:', pointData.bonus, '→ 表示:', formatNumber(pointData.bonus));
+            console.log('期限切れ:', pointData.expired, '→ 表示:', formatNumber(pointData.expired));
+            console.log('合計:', total, '→ 表示:', formatNumber(total));
             console.log('');
+            console.log('計算式: ' + pointData.current + ' + ' + pointData.earned + ' + ' + pointData.bonus + ' - ' + pointData.expired + ' = ' + total);
         }
 
         // ポイントを更新（ランダムに変更）
@@ -342,7 +391,7 @@
             pointData.current = Math.floor(Math.random() * 5000) + 1000;
             pointData.earned = Math.floor(Math.random() * 500) + 100;
             pointData.bonus = Math.floor(Math.random() * 300) + 50;
-            pointData.expired = -(Math.floor(Math.random() * 300) + 100);
+            pointData.expired = Math.floor(Math.random() * 300) + 100;
 
             console.log('新しいポイントデータ:', pointData);
 
