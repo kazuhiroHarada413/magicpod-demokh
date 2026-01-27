@@ -14,7 +14,7 @@
             background-color: #f5f5f5;
             margin: 0;
             padding: 20px;
-            padding-bottom: 120px; /* クッキーバナー分の余白 */
+            padding-bottom: 50px; /* 余白を小さくしてボタンがバナーに隠れやすく */
         }
 
         .container {
@@ -22,6 +22,7 @@
             margin: 30px auto;
             background-color: white;
             padding: 40px;
+            padding-bottom: 20px; /* 下部のパディングを小さく */
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             min-height: 1200px;
@@ -95,7 +96,7 @@
             cursor: pointer;
             font-size: 18px;
             width: 100%;
-            margin: 30px 0;
+            margin: 30px 0 0 0; /* 下のマージンを削除してページ最下部に */
             transition: background-color 0.2s;
         }
 
@@ -122,13 +123,14 @@
             right: 0;
             background-color: #343a40;
             color: white;
-            padding: 20px;
+            padding: 30px 20px;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
             z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
+            min-height: 150px; /* バナーの高さを大きく */
         }
 
         #cookie-banner-content {
@@ -293,6 +295,27 @@
                 </div>
             </div>
 
+            <div class="dev-info" style="margin-top: 20px; margin-bottom: 30px;">
+                <strong>開発者向け情報:</strong><br>
+                送信ボタンid: submit-btn<br>
+                クッキーバナーid: cookie-banner<br>
+                同意ボタンid: accept-cookies-btn<br>
+                <br>
+                <strong class="warning-text">⚠ このページの問題:</strong><br>
+                クッキー同意バナーが画面下部に固定表示され、送信ボタンに重なっています。<br>
+                バナーを閉じないと送信ボタンをクリックできません。<br>
+                <br>
+                <strong>解決方法:</strong><br>
+                1. バナーの「同意する」ボタンを先にクリック<br>
+                2. または、送信ボタンを画面中央にスクロール<br>
+                <br>
+                <strong>エラーメッセージ例:</strong>
+                <div class="error-example">
+                    Element is not clickable at point (x, y).<br>
+                    Other element would receive the click: &lt;div id="cookie-banner"&gt;
+                </div>
+            </div>
+
             <button type="button" id="submit-btn" class="btn-submit" onclick="submitSurvey()">
                 アンケートを送信
             </button>
@@ -301,27 +324,6 @@
         <div id="success-message">
             <strong>✓ アンケートの送信が完了しました</strong><br>
             ご協力ありがとうございました！
-        </div>
-
-        <div class="dev-info">
-            <strong>開発者向け情報:</strong><br>
-            送信ボタンid: submit-btn<br>
-            クッキーバナーid: cookie-banner<br>
-            同意ボタンid: accept-cookies-btn<br>
-            <br>
-            <strong class="warning-text">⚠ このページの問題:</strong><br>
-            クッキー同意バナーが画面下部に固定表示され、送信ボタンに重なっています。<br>
-            バナーを閉じないと送信ボタンをクリックできません。<br>
-            <br>
-            <strong>解決方法:</strong><br>
-            1. バナーの「同意する」ボタンを先にクリック<br>
-            2. または、送信ボタンを画面中央にスクロール<br>
-            <br>
-            <strong>エラーメッセージ例:</strong>
-            <div class="error-example">
-                Element is not clickable at point (x, y).<br>
-                Other element would receive the click: &lt;div id="cookie-banner"&gt;
-            </div>
         </div>
     </div>
 
