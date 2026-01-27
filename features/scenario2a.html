@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シナリオ2A: 商品在庫検索</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-search {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin: 15px 0;
+            transition: background-color 0.2s;
+        }
+
+        .btn-search:hover {
+            background-color: #218838;
+        }
+
+        .btn-search:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        #loading {
+            display: none;
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 20px;
+            border: 1px solid #ffc107;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-icon {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+
+        #result {
+            display: none;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .result-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .result-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .dev-info {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .dev-info strong {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>商品在庫検索</h1>
+        <p class="description">商品コードを入力して、在庫状況を確認できます。</p>
+
+        <form id="search-form" onsubmit="return false;">
+            <div class="form-group">
+                <label for="product-code">商品コード</label>
+                <input type="text" id="product-code" placeholder="商品コード（例: ABC123）">
+            </div>
+
+            <button type="button" id="search-btn" class="btn-search" onclick="searchInventory()">
+                在庫を検索
+            </button>
+        </form>
+
+        <div id="loading">
+            <span class="loading-icon">🔄</span> 検索中...<br>
+            サーバーから在庫情報を取得しています<br>
+            <small>（あと<span id="remaining-time">-</span>秒）</small>
+        </div>
+
+        <div id="result"></div>
+
+        <div class="dev-info">
+            <strong>開発者向け情報:</strong><br>
+            ローディング要素のid: loading<br>
+            結果表示要素のid: result<br>
+            待ち時間: 1〜4秒（ランダム）<br>
+            ヒント: 「要素が表示されるまで待機」コマンドを使用してください
+        </div>
+    </div>
+
+    <script>
+        function searchInventory() {
+            // 1. 入力値を取得
+            const productCode = document.getElementById('product-code').value.trim();
+
+            // 2. 以前の結果をクリア
+            document.getElementById('result').style.display = 'none';
+
+            // 3. バリデーション
+            if (!productCode) {
+                showError('商品コードを入力してください');
+                return;
+            }
+
+            // 4. ローディング表示を開始
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('search-btn').disabled = true;
+
+            // 5. ランダムな待ち時間を生成（1000〜4000ミリ秒 = 1〜4秒）
+            const randomDelay = Math.floor(Math.random() * 3000) + 1000;
+
+            // 6. コンソールログ出力（デバッグ用）
+            console.log('=== 検索処理開始 ===');
+            console.log('商品コード:', productCode);
+            console.log('開始時刻:', new Date().toLocaleTimeString());
+            console.log('待ち時間:', randomDelay + 'ms');
+            console.log('ローディング表示中...');
+
+            // 7. カウントダウン表示
+            let remainingTime = Math.ceil(randomDelay / 1000);
+            const remainingTimeSpan = document.getElementById('remaining-time');
+            remainingTimeSpan.textContent = remainingTime;
+
+            const countdownInterval = setInterval(() => {
+                remainingTime--;
+                if (remainingTime > 0) {
+                    remainingTimeSpan.textContent = remainingTime;
+                } else {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
+
+            // 8. 指定時間後に結果を表示
+            setTimeout(() => {
+                // カウントダウンを停止
+                clearInterval(countdownInterval);
+
+                // ローディングを非表示
+                document.getElementById('loading').style.display = 'none';
+
+                // 結果を表示
+                showResult(productCode);
+
+                // ボタンを再度有効化
+                document.getElementById('search-btn').disabled = false;
+
+                // コンソールログ出力
+                console.log('結果表示完了');
+                console.log('完了時刻:', new Date().toLocaleTimeString());
+                console.log('=== 検索処理終了 ===');
+            }, randomDelay);
+        }
+
+        function showResult(productCode) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result-success';
+            resultDiv.innerHTML = `
+                <strong>✓ 在庫確認完了</strong><br>
+                商品コード: ${escapeHtml(productCode)}<br>
+                在庫状況: 在庫あり（15個）
+            `;
+        }
+
+        function showError(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result-error';
+            resultDiv.innerHTML = `
+                <strong>⚠ エラー</strong><br>
+                ${escapeHtml(message)}
+            `;
+        }
+
+        // XSS対策用のエスケープ関数
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

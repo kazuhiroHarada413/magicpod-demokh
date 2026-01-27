@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シナリオ2B: 配送先住所登録</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 15px 0 5px 0;
+            color: #333;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        select:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            color: #6c757d;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            font-size: 12px;
+            color: #6c757d;
+            font-style: italic;
+            margin-left: 10px;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        .btn-register {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin: 20px 0;
+            transition: background-color 0.2s;
+        }
+
+        .btn-register:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+
+        .btn-register:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        #result {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .dev-info {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .dev-info strong {
+            color: #333;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-row select {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>配送先住所登録</h1>
+        <p class="description">配送先の都道府県と市区町村を選択してください。</p>
+
+        <form id="address-form" onsubmit="return false;">
+            <div class="form-group">
+                <label for="prefecture">都道府県</label>
+                <div class="form-row">
+                    <select id="prefecture" name="prefecture">
+                        <option value="">選択してください</option>
+                    </select>
+                    <span id="prefecture-loading" class="loading" style="display: none;">読み込み中...</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="city">市区町村</label>
+                <div class="form-row">
+                    <select id="city" name="city" disabled>
+                        <option value="">都道府県を選択してください</option>
+                    </select>
+                    <span id="city-loading" class="loading" style="display: none;">読み込み中...</span>
+                </div>
+            </div>
+
+            <button type="button" id="register-btn" class="btn-register" disabled>
+                住所を登録
+            </button>
+        </form>
+
+        <div id="result"></div>
+
+        <div class="dev-info">
+            <strong>開発者向け情報:</strong><br>
+            都道府県ドロップダウンid: prefecture<br>
+            市区町村ドロップダウンid: city<br>
+            待ち時間: 0.5〜2秒（各ドロップダウンでランダム）<br>
+            <br>
+            <strong>待機のヒント:</strong><br>
+            - 方法1: 特定の選択肢が表示されるまで待機<br>
+            - 方法2: 要素が有効化（enabled）されるまで待機<br>
+            - 方法3: オプション数が変化するまで待機
+        </div>
+    </div>
+
+    <script>
+        let prefecturesLoaded = false; // 読み込み済みフラグ
+
+        // 都道府県ドロップダウンクリック時（フォーカス時）
+        document.getElementById('prefecture').addEventListener('focus', function() {
+            // すでに読み込み済みの場合はスキップ
+            if (prefecturesLoaded) {
+                return;
+            }
+
+            console.log('=== 都道府県リスト読み込み開始 ===');
+            console.log('開始時刻:', new Date().toLocaleTimeString());
+
+            // ローディング表示
+            document.getElementById('prefecture-loading').style.display = 'inline';
+
+            // ランダムな待ち時間を生成（500〜2000ミリ秒 = 0.5〜2秒）
+            const randomDelay = Math.floor(Math.random() * 1500) + 500;
+            console.log('待ち時間:', randomDelay + 'ms');
+
+            // 選択肢を動的に追加
+            setTimeout(() => {
+                const prefectureSelect = document.getElementById('prefecture');
+
+                // 既存のオプションをクリア
+                prefectureSelect.innerHTML = '<option value="">選択してください</option>';
+
+                // 新しいオプションを追加
+                const prefectures = [
+                    { value: 'hokkaido', text: '北海道' },
+                    { value: 'tokyo', text: '東京都' },
+                    { value: 'osaka', text: '大阪府' },
+                    { value: 'fukuoka', text: '福岡県' }
+                ];
+
+                prefectures.forEach(pref => {
+                    const option = document.createElement('option');
+                    option.value = pref.value;
+                    option.textContent = pref.text;
+                    prefectureSelect.appendChild(option);
+                });
+
+                // ローディング非表示
+                document.getElementById('prefecture-loading').style.display = 'none';
+
+                // 読み込み完了フラグ
+                prefecturesLoaded = true;
+
+                console.log('都道府県リスト読み込み完了');
+                console.log('完了時刻:', new Date().toLocaleTimeString());
+                console.log('=== 都道府県リスト読み込み終了 ===');
+            }, randomDelay);
+        });
+
+        // 都道府県選択時
+        document.getElementById('prefecture').addEventListener('change', function() {
+            const selectedPrefecture = this.value;
+            const citySelect = document.getElementById('city');
+            const cityLoading = document.getElementById('city-loading');
+
+            // 結果をクリア
+            document.getElementById('result').style.display = 'none';
+
+            // 都道府県が選択されていない場合
+            if (!selectedPrefecture) {
+                citySelect.disabled = true;
+                citySelect.innerHTML = '<option value="">都道府県を選択してください</option>';
+                document.getElementById('register-btn').disabled = true;
+                return;
+            }
+
+            console.log('=== 市区町村リスト読み込み開始 ===');
+            console.log('選択された都道府県:', selectedPrefecture);
+            console.log('開始時刻:', new Date().toLocaleTimeString());
+
+            // 市区町村ドロップダウンを一時的に無効化
+            citySelect.disabled = true;
+            citySelect.innerHTML = '<option value="">読み込み中...</option>';
+
+            // 登録ボタンを無効化
+            document.getElementById('register-btn').disabled = true;
+
+            // ローディング表示
+            cityLoading.style.display = 'inline';
+
+            // ランダムな待ち時間を生成（500〜2000ミリ秒）
+            const randomDelay = Math.floor(Math.random() * 1500) + 500;
+            console.log('待ち時間:', randomDelay + 'ms');
+
+            // 市区町村リストを動的に読み込み
+            setTimeout(() => {
+                citySelect.innerHTML = '<option value="">選択してください</option>';
+
+                // 都道府県に応じた市区町村リスト
+                let cities = [];
+                if (selectedPrefecture === 'tokyo') {
+                    cities = [
+                        { value: 'chiyoda', text: '千代田区' },
+                        { value: 'chuo', text: '中央区' },
+                        { value: 'minato', text: '港区' },
+                        { value: 'shinjuku', text: '新宿区' },
+                        { value: 'shibuya', text: '渋谷区' }
+                    ];
+                } else if (selectedPrefecture === 'osaka') {
+                    cities = [
+                        { value: 'osaka-city', text: '大阪市' },
+                        { value: 'sakai', text: '堺市' },
+                        { value: 'toyonaka', text: '豊中市' }
+                    ];
+                } else if (selectedPrefecture === 'hokkaido') {
+                    cities = [
+                        { value: 'sapporo', text: '札幌市' },
+                        { value: 'hakodate', text: '函館市' },
+                        { value: 'asahikawa', text: '旭川市' }
+                    ];
+                } else if (selectedPrefecture === 'fukuoka') {
+                    cities = [
+                        { value: 'fukuoka-city', text: '福岡市' },
+                        { value: 'kitakyushu', text: '北九州市' },
+                        { value: 'kurume', text: '久留米市' }
+                    ];
+                } else {
+                    cities = [
+                        { value: 'city-a', text: '市区町村A' },
+                        { value: 'city-b', text: '市区町村B' }
+                    ];
+                }
+
+                cities.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.value;
+                    option.textContent = city.text;
+                    citySelect.appendChild(option);
+                });
+
+                // 市区町村ドロップダウンを有効化
+                citySelect.disabled = false;
+
+                // ローディング非表示
+                cityLoading.style.display = 'none';
+
+                console.log('市区町村リスト読み込み完了');
+                console.log('完了時刻:', new Date().toLocaleTimeString());
+                console.log('=== 市区町村リスト読み込み終了 ===');
+            }, randomDelay);
+        });
+
+        // 市区町村選択時
+        document.getElementById('city').addEventListener('change', function() {
+            const prefecture = document.getElementById('prefecture').value;
+            const city = this.value;
+            const registerBtn = document.getElementById('register-btn');
+
+            // 両方選択されている場合のみボタンを有効化
+            if (prefecture && city) {
+                registerBtn.disabled = false;
+            } else {
+                registerBtn.disabled = true;
+            }
+        });
+
+        // 登録ボタンクリック時
+        document.getElementById('register-btn').addEventListener('click', function() {
+            const prefecture = document.getElementById('prefecture');
+            const city = document.getElementById('city');
+
+            const prefectureName = prefecture.options[prefecture.selectedIndex].text;
+            const cityName = city.options[city.selectedIndex].text;
+
+            console.log('=== 住所登録 ===');
+            console.log('都道府県:', prefectureName);
+            console.log('市区町村:', cityName);
+
+            // 結果を表示
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <strong>✓ 住所登録完了</strong><br>
+                都道府県: ${escapeHtml(prefectureName)}<br>
+                市区町村: ${escapeHtml(cityName)}
+            `;
+        });
+
+        // XSS対策用のエスケープ関数
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
