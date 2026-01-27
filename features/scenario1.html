@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シナリオ1: 商品注文フォーム</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        #result-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .dev-info {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .dev-info strong {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>商品注文フォーム</h1>
+        <p class="description">以下のフォームに入力して、注文を送信してください。</p>
+
+        <form id="order-form" onsubmit="return false;">
+            <div class="form-group">
+                <label for="product-name">商品名</label>
+                <input type="text" id="product-name" placeholder="商品名を入力">
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">数量</label>
+                <input type="number" id="quantity" placeholder="数量" value="1" min="1">
+            </div>
+
+            <button type="button" id="submit-btn" aria-label="submit-order" class="btn-primary">
+                送信
+            </button>
+        </form>
+
+        <div id="result-message"></div>
+
+        <div class="dev-info">
+            <strong>開発者向け情報:</strong><br>
+            現在のボタンテキスト: <span id="current-button-text"></span><br>
+            ボタンのid: submit-btn（固定）<br>
+            ボタンのaria-label: submit-order（固定）
+        </div>
+    </div>
+
+    <script>
+        // ボタンテキストの候補
+        const buttonTexts = ['送信', 'Submit', '提交', '送る', '注文する'];
+
+        // ページロード時にボタンのテキストをランダムで設定
+        window.addEventListener('DOMContentLoaded', function() {
+            const randomIndex = Math.floor(Math.random() * buttonTexts.length);
+            const randomText = buttonTexts[randomIndex];
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.textContent = randomText;
+
+            // 開発者向け情報を更新
+            document.getElementById('current-button-text').textContent = randomText;
+
+            // コンソールログ出力
+            console.log('ボタンテキストが設定されました:', randomText);
+        });
+
+        // 送信ボタンクリック時の処理
+        document.getElementById('submit-btn').addEventListener('click', function() {
+            // フォームの値を取得
+            const productName = document.getElementById('product-name').value;
+            const quantity = document.getElementById('quantity').value;
+
+            // コンソールログ出力
+            console.log('送信ボタンがクリックされました');
+            console.log('商品名:', productName);
+            console.log('数量:', quantity);
+
+            // バリデーション
+            if (!productName || !quantity) {
+                alert('すべての項目を入力してください');
+                return;
+            }
+
+            // 結果メッセージを表示
+            const resultDiv = document.getElementById('result-message');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '✓ 注文が完了しました！';
+            resultDiv.style.backgroundColor = '#d4edda';
+            resultDiv.style.color = '#155724';
+            resultDiv.style.padding = '15px';
+            resultDiv.style.borderRadius = '5px';
+            resultDiv.style.marginTop = '20px';
+        });
+    </script>
+</body>
+</html>
