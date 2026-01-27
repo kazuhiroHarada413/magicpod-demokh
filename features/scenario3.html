@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シナリオ3: 商品価格計算</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 15px 0 5px 0;
+            color: #333;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        .button-group {
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px 10px 0;
+            transition: background-color 0.2s;
+        }
+
+        .btn-calculate {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-calculate:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-reset {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background-color: #545b62;
+        }
+
+        .btn-debug {
+            background-color: #ffc107;
+            color: #000;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .btn-debug:hover {
+            background-color: #e0a800;
+        }
+
+        #result {
+            display: none;
+            background-color: #e7f3ff;
+            border: 2px solid #007bff;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+        #debug-info {
+            display: none;
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 12px;
+            margin: 20px 0;
+            white-space: pre-wrap;
+        }
+
+        .dev-info {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .dev-info strong {
+            color: #333;
+        }
+
+        .warning-text {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>商品価格計算</h1>
+        <p class="description">商品の単価と数量を入力して、合計金額を計算します。</p>
+
+        <form id="calc-form" onsubmit="return false;">
+            <div class="form-group">
+                <label for="price">単価（円）</label>
+                <input type="text" id="price" name="price" placeholder="単価（円）" value="1000">
+            </div>
+
+            <div class="form-group">
+                <label for="quantity">数量</label>
+                <input type="text" id="quantity" name="quantity" placeholder="数量" value="2">
+            </div>
+
+            <div class="button-group">
+                <button type="button" id="calculate-btn" class="btn btn-calculate" onclick="calculateTotal()">
+                    合計を計算
+                </button>
+                <button type="button" id="reset-btn" class="btn btn-reset" onclick="resetForm()">
+                    リセット
+                </button>
+            </div>
+        </form>
+
+        <div id="result"></div>
+
+        <div style="margin-top: 20px;">
+            <button onclick="toggleDebugMode()" class="btn btn-debug">
+                🐛 デバッグ情報を表示/非表示
+            </button>
+        </div>
+
+        <div id="debug-info"></div>
+
+        <div class="dev-info">
+            <strong>開発者向け情報:</strong><br>
+            単価入力フィールドid: price<br>
+            数量入力フィールドid: quantity<br>
+            結果表示エリアid: result<br>
+            <br>
+            <strong class="warning-text">⚠ このページには意図的なバグがあります:</strong><br>
+            入力値が文字列として扱われ、数値計算ではなく文字列結合が行われます。<br>
+            期待: 1000 × 2 = 2000<br>
+            実際: "1000" + "2" = "10002"<br>
+            <br>
+            <strong>ヒント:</strong> ブラウザのコンソール（F12）でログを確認してください。
+        </div>
+    </div>
+
+    <script>
+        // 計算処理（意図的なバグを含む）
+        function calculateTotal() {
+            console.log('=== 計算処理開始 ===');
+            console.log('現在時刻:', new Date().toLocaleTimeString());
+
+            // 入力値を取得（ここがバグの原因：文字列として取得される）
+            const price = document.getElementById('price').value;
+            const quantity = document.getElementById('quantity').value;
+
+            console.log('--- 取得した値 ---');
+            console.log('単価（値）:', price);
+            console.log('単価（型）:', typeof price);
+            console.log('数量（値）:', quantity);
+            console.log('数量（型）:', typeof quantity);
+
+            // バリデーション
+            if (!price || !quantity) {
+                alert('単価と数量を入力してください');
+                return;
+            }
+
+            if (price <= 0 || quantity <= 0) {
+                alert('単価と数量は0より大きい値を入力してください');
+                return;
+            }
+
+            // ★★★ バグ：文字列同士の加算になってしまう ★★★
+            // 例: "1000" + "2" = "10002"（文字列結合）
+            // 正しくは: 1000 * 2 = 2000（数値計算）
+            const total = price + quantity;
+
+            console.log('--- 計算結果 ---');
+            console.log('計算式:', `"${price}" + "${quantity}"`);
+            console.log('結果（値）:', total);
+            console.log('結果（型）:', typeof total);
+            console.log('期待される結果:', Number(price) * Number(quantity));
+            console.log('=== 計算処理終了 ===');
+            console.log('');
+
+            // 結果を表示
+            displayResult(price, quantity, total);
+
+            // デバッグ情報を更新
+            updateDebugInfo(price, quantity, total);
+        }
+
+        // 結果表示
+        function displayResult(price, quantity, total) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <strong>計算結果</strong><br>
+                単価: ${escapeHtml(String(price))}円<br>
+                数量: ${escapeHtml(String(quantity))}個<br>
+                <strong style="font-size: 20px; color: #007bff;">合計: ${escapeHtml(String(total))}円</strong>
+            `;
+        }
+
+        // デバッグ情報を更新
+        function updateDebugInfo(price, quantity, total) {
+            const debugDiv = document.getElementById('debug-info');
+            const expectedTotal = Number(price) * Number(quantity);
+            debugDiv.innerHTML = `<strong>🐛 デバッグ情報:</strong>
+
+単価の値: "${escapeHtml(String(price))}"
+単価の型: ${typeof price}
+数量の値: "${escapeHtml(String(quantity))}"
+数量の型: ${typeof quantity}
+
+計算式: "${escapeHtml(String(price))}" + "${escapeHtml(String(quantity))}" = "${escapeHtml(String(total))}"
+結果の型: ${typeof total}
+
+<strong style="color: #dc3545;">問題:</strong> 文字列同士の結合になっています！
+<strong style="color: #28a745;">期待:</strong> 数値計算 (${price} × ${quantity} = ${expectedTotal})`;
+        }
+
+        // リセット処理
+        function resetForm() {
+            console.log('フォームをリセットしました');
+
+            // 入力値を初期値に戻す
+            document.getElementById('price').value = '1000';
+            document.getElementById('quantity').value = '2';
+
+            // 結果を非表示
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('debug-info').style.display = 'none';
+        }
+
+        // デバッグモード切り替え
+        function toggleDebugMode() {
+            const debugInfo = document.getElementById('debug-info');
+            if (debugInfo.style.display === 'none' || debugInfo.style.display === '') {
+                debugInfo.style.display = 'block';
+            } else {
+                debugInfo.style.display = 'none';
+            }
+        }
+
+        // XSS対策用のエスケープ関数
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
