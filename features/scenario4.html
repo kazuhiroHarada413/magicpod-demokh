@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シナリオ4: アンケート送信フォーム</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            padding-bottom: 120px; /* クッキーバナー分の余白 */
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-height: 1200px;
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin: 25px 0 10px 0;
+            font-size: 16px;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .radio-group {
+            margin: 10px 0 20px 0;
+        }
+
+        .radio-option {
+            display: block;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            margin: 30px 0;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+
+        #success-message {
+            display: none;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 30px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 18px;
+            margin: 20px 0;
+        }
+
+        /* クッキーバナー（最重要） */
+        #cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        #cookie-banner-content {
+            flex: 1;
+            margin-right: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        #cookie-banner-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        #accept-cookies-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+
+        #accept-cookies-btn:hover {
+            background-color: #218838;
+        }
+
+        #privacy-policy-link {
+            color: #17a2b8;
+            text-decoration: underline;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        #privacy-policy-link:hover {
+            color: #138496;
+        }
+
+        .debug-panel {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #fff3cd;
+            border-radius: 5px;
+        }
+
+        .btn-debug {
+            background-color: #ffc107;
+            color: #000;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-debug:hover {
+            background-color: #e0a800;
+        }
+
+        .dev-info {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .dev-info strong {
+            color: #333;
+        }
+
+        .warning-text {
+            color: #856404;
+        }
+
+        .error-example {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>お客様アンケート</h1>
+        <p class="description">サービス向上のため、アンケートへのご協力をお願いします。</p>
+
+        <div class="debug-panel">
+            <strong>🔧 テスト用ボタン</strong><br>
+            <button onclick="resetCookieBanner()" class="btn-debug">
+                クッキーバナーを再表示
+            </button>
+            <small style="display: block; margin-top: 5px; color: #856404;">
+                ※ テストを繰り返す場合に使用してください
+            </small>
+        </div>
+
+        <form id="survey-form" onsubmit="return false;">
+            <div class="form-group">
+                <label for="name">質問1: お名前</label>
+                <input type="text" id="name" placeholder="お名前（任意）">
+            </div>
+
+            <div class="form-group">
+                <label>質問2: 今回のサービスにどの程度満足されましたか？</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="satisfaction" value="5"> とても満足
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="satisfaction" value="4"> 満足
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="satisfaction" value="3"> 普通
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="satisfaction" value="2"> 不満
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="satisfaction" value="1"> とても不満
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="comment">質問3: ご意見・ご感想</label>
+                <textarea id="comment" rows="5" placeholder="ご意見・ご感想をお聞かせください（任意）"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="frequency">質問4: どのくらいの頻度でご利用いただいていますか？</label>
+                <select id="frequency">
+                    <option value="">選択してください</option>
+                    <option value="daily">毎日</option>
+                    <option value="weekly">週に数回</option>
+                    <option value="monthly">月に数回</option>
+                    <option value="first">初めて</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>質問5: このサービスを友人や同僚におすすめしたいですか？</label>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="recommend" value="yes"> はい
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="recommend" value="no"> いいえ
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="recommend" value="unknown"> わからない
+                    </label>
+                </div>
+            </div>
+
+            <button type="button" id="submit-btn" class="btn-submit" onclick="submitSurvey()">
+                アンケートを送信
+            </button>
+        </form>
+
+        <div id="success-message">
+            <strong>✓ アンケートの送信が完了しました</strong><br>
+            ご協力ありがとうございました！
+        </div>
+
+        <div class="dev-info">
+            <strong>開発者向け情報:</strong><br>
+            送信ボタンid: submit-btn<br>
+            クッキーバナーid: cookie-banner<br>
+            同意ボタンid: accept-cookies-btn<br>
+            <br>
+            <strong class="warning-text">⚠ このページの問題:</strong><br>
+            クッキー同意バナーが画面下部に固定表示され、送信ボタンに重なっています。<br>
+            バナーを閉じないと送信ボタンをクリックできません。<br>
+            <br>
+            <strong>解決方法:</strong><br>
+            1. バナーの「同意する」ボタンを先にクリック<br>
+            2. または、送信ボタンを画面中央にスクロール<br>
+            <br>
+            <strong>エラーメッセージ例:</strong>
+            <div class="error-example">
+                Element is not clickable at point (x, y).<br>
+                Other element would receive the click: &lt;div id="cookie-banner"&gt;
+            </div>
+        </div>
+    </div>
+
+    <!-- クッキー同意バナー -->
+    <div id="cookie-banner">
+        <div id="cookie-banner-content">
+            🍪 このサイトではCookieを使用しています<br>
+            快適なサービス提供のため、Cookieの使用にご同意ください。
+            詳しくは<a id="privacy-policy-link" href="#">プライバシーポリシー</a>をご確認ください。
+        </div>
+        <div id="cookie-banner-actions">
+            <button id="accept-cookies-btn" onclick="acceptCookies()">同意する</button>
+        </div>
+    </div>
+
+    <script>
+        // ページロード時のクッキーバナー表示制御
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('=== ページロード完了 ===');
+
+            // 以前に同意済みかチェック
+            const cookiesAccepted = localStorage.getItem('cookiesAccepted');
+
+            if (cookiesAccepted === 'true') {
+                console.log('過去に同意済みのため、バナーを非表示にします');
+                document.getElementById('cookie-banner').style.display = 'none';
+            } else {
+                console.log('初回訪問または未同意のため、バナーを表示します');
+                document.getElementById('cookie-banner').style.display = 'flex';
+            }
+
+            // 送信ボタンの位置をログ
+            const submitBtn = document.getElementById('submit-btn');
+            const rect = submitBtn.getBoundingClientRect();
+            console.log('送信ボタン位置:', {
+                top: rect.top,
+                bottom: rect.bottom,
+                left: rect.left,
+                right: rect.right
+            });
+        });
+
+        // クッキーバナーの同意ボタンクリック時
+        function acceptCookies() {
+            console.log('=== クッキー同意処理 ===');
+            console.log('時刻:', new Date().toLocaleTimeString());
+
+            // バナーを非表示にする
+            const banner = document.getElementById('cookie-banner');
+            banner.style.display = 'none';
+
+            console.log('クッキーバナーを非表示にしました');
+
+            // ローカルストレージに保存
+            localStorage.setItem('cookiesAccepted', 'true');
+
+            console.log('同意情報を保存しました');
+        }
+
+        // 送信ボタンクリック時
+        function submitSurvey() {
+            console.log('=== アンケート送信処理 ===');
+            console.log('時刻:', new Date().toLocaleTimeString());
+
+            // バナーの状態をログ
+            const bannerDisplay = document.getElementById('cookie-banner').style.display;
+            console.log('バナー状態:', bannerDisplay);
+
+            // フォームの値を取得
+            const name = document.getElementById('name').value;
+            const satisfaction = document.querySelector('input[name="satisfaction"]:checked');
+            const comment = document.getElementById('comment').value;
+            const frequency = document.getElementById('frequency').value;
+            const recommend = document.querySelector('input[name="recommend"]:checked');
+
+            console.log('--- 入力内容 ---');
+            console.log('お名前:', name || '未入力');
+            console.log('満足度:', satisfaction ? satisfaction.value : '未選択');
+            console.log('コメント:', comment || '未入力');
+            console.log('利用頻度:', frequency || '未選択');
+            console.log('おすすめ:', recommend ? recommend.value : '未選択');
+
+            // 必須項目チェック
+            if (!satisfaction) {
+                alert('満足度を選択してください');
+                return;
+            }
+
+            if (!recommend) {
+                alert('「おすすめしたいか」を選択してください');
+                return;
+            }
+
+            // フォームを非表示
+            document.getElementById('survey-form').style.display = 'none';
+
+            // 送信完了メッセージを表示
+            const successMessage = document.getElementById('success-message');
+            successMessage.style.display = 'block';
+
+            // ページトップにスクロール
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            console.log('アンケート送信完了');
+            console.log('=== 処理終了 ===');
+        }
+
+        // テスト用：バナー再表示
+        function resetCookieBanner() {
+            console.log('=== クッキーバナーリセット ===');
+            localStorage.removeItem('cookiesAccepted');
+            document.getElementById('cookie-banner').style.display = 'flex';
+            document.getElementById('survey-form').style.display = 'block';
+            document.getElementById('success-message').style.display = 'none';
+            console.log('バナーを再表示しました');
+        }
+
+        // プライバシーポリシーリンク（何もしない）
+        document.getElementById('privacy-policy-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('プライバシーポリシーリンクがクリックされました（ダミー）');
+            alert('プライバシーポリシーページ（デモのためダミー表示）');
+        });
+    </script>
+</body>
+</html>
