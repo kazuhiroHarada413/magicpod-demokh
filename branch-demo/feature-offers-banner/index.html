@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[PREVIEW] エレホーム - 家電のオンラインストア</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; background: #f4f6f8; color: #222; }
+    button { font-family: inherit; }
+
+    .header {
+      background: #ffffff; border-bottom: 1px solid #e3e6ea;
+      padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: bold; color: #0b5cad; white-space: nowrap; }
+    .logo svg { width: 28px; height: 28px; }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .header-link { color: #555; font-size: 14px; text-decoration: none; }
+    .cart-btn {
+      background: #0b5cad; color: #fff; border: none; padding: 8px 16px; border-radius: 20px;
+      display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; white-space: nowrap;
+    }
+    .cart-btn svg { width: 18px; height: 18px; }
+    .cart-count {
+      background: #fff; color: #0b5cad; border-radius: 50%; width: 20px; height: 20px;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;
+    }
+
+    .hero { background: linear-gradient(120deg, #0b5cad, #1f8ae0); color: #fff; padding: 48px 24px; text-align: center; }
+    .hero h1 { font-size: 34px; margin-bottom: 10px; }
+    .hero p { font-size: 16px; opacity: 0.9; }
+
+    .sale-banner {
+      max-width: 1120px; margin: 24px auto 0; padding: 0 24px;
+    }
+    .sale-banner-inner {
+      background: linear-gradient(100deg, #d6336c, #f06595 55%, #f9a8c9); color: #fff; border-radius: 12px;
+      padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .sale-banner-text { display: flex; align-items: center; gap: 14px; }
+    .sale-banner-text svg { width: 36px; height: 36px; flex-shrink: 0; }
+    .sale-banner-title { font-size: 20px; font-weight: bold; }
+    .sale-banner-period { display: inline-block; background: rgba(255,255,255,0.25); font-size: 12px; font-weight: bold; padding: 2px 10px; border-radius: 10px; margin-bottom: 4px; }
+    .sale-banner-sub { font-size: 13px; opacity: 0.95; margin-top: 2px; }
+    .sale-banner-btn {
+      background: #fff; color: #c2255c; border: none; border-radius: 20px; padding: 10px 20px;
+      font-size: 14px; font-weight: bold; cursor: pointer;
+    }
+    .sale-badge { position: absolute; top: 12px; left: 12px; background: #d93025; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 10px; }
+    .price.on-sale { color: #d93025; }
+    .show-all-btn { background: none; border: none; color: #0b5cad; font-size: 14px; cursor: pointer; display: none; }
+    .product-card.hidden { display: none; }
+
+    .main { max-width: 1120px; margin: 0 auto; padding: 32px 24px 64px; }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; }
+    .section-title { font-size: 22px; font-weight: bold; }
+
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+    .product-card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); display: flex; flex-direction: column; overflow: hidden; }
+    .product-img { height: 170px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .product-img svg { width: 76px; height: 76px; }
+    .product-body { padding: 16px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .product-category { font-size: 12px; color: #888; }
+    .product-name { font-size: 15px; font-weight: bold; line-height: 1.4; }
+    .price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; padding-top: 6px; }
+    .price { font-size: 20px; font-weight: bold; color: #222; }
+    .price-original { font-size: 13px; color: #999; text-decoration: line-through; }
+    .add-cart-btn {
+      margin: 0 16px 16px; background: #0b5cad; color: #fff; border: none; border-radius: 8px;
+      padding: 11px; font-size: 14px; font-weight: bold; cursor: pointer; transition: background 0.2s;
+    }
+    .add-cart-btn:hover { background: #084a8c; }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%) translateY(20px);
+      background: #222; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px;
+      opacity: 0; pointer-events: none; transition: all 0.25s; z-index: 500;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; display: none; }
+    .overlay.open { display: block; }
+    .cart-drawer {
+      position: fixed; top: 0; right: 0; width: 400px; max-width: 100%; height: 100vh; background: #fff; z-index: 301;
+      transform: translateX(100%); transition: transform 0.25s; display: flex; flex-direction: column;
+    }
+    .cart-drawer.open { transform: translateX(0); }
+    .drawer-head { padding: 20px 24px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .drawer-head h2 { font-size: 18px; }
+    .icon-btn { background: none; border: none; cursor: pointer; color: #666; padding: 4px; display: flex; }
+    .icon-btn svg { width: 22px; height: 22px; }
+    .cart-items { flex: 1; overflow-y: auto; padding: 8px 24px; }
+    .cart-empty { text-align: center; color: #999; padding: 48px 0; font-size: 14px; }
+    .cart-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
+    .cart-item-name { font-size: 14px; font-weight: bold; }
+    .cart-item-meta { font-size: 12px; color: #777; margin-top: 4px; }
+    .cart-item-price { font-size: 14px; font-weight: bold; white-space: nowrap; }
+    .drawer-foot { padding: 20px 24px; border-top: 1px solid #eee; }
+    .cart-total { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 16px; }
+    .checkout-btn {
+      width: 100%; background: #f08c00; color: #fff; border: none; border-radius: 8px; padding: 14px;
+      font-size: 16px; font-weight: bold; cursor: pointer;
+    }
+    .checkout-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+    .modal {
+      position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 440px; max-width: calc(100% - 32px);
+      background: #fff; border-radius: 12px; z-index: 400; padding: 28px; display: none;
+    }
+    .modal.open { display: block; }
+    .modal h2 { font-size: 20px; margin-bottom: 20px; }
+    .form-row { margin-bottom: 16px; }
+    .form-row label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+    .form-row input, .form-row select { width: 100%; padding: 10px 12px; border: 1px solid #ccd2d8; border-radius: 6px; font-size: 14px; }
+    .form-error { color: #d93025; font-size: 12px; margin-top: 4px; display: none; }
+    .summary { background: #f4f6f8; border-radius: 8px; padding: 12px 16px; font-size: 14px; margin-bottom: 20px; display: flex; justify-content: space-between; }
+    .modal-actions { display: flex; gap: 12px; }
+    .btn-secondary { flex: 1; background: #fff; border: 1px solid #ccd2d8; border-radius: 8px; padding: 12px; font-size: 14px; cursor: pointer; }
+    .btn-primary { flex: 2; background: #0b5cad; color: #fff; border: none; border-radius: 8px; padding: 12px; font-size: 14px; font-weight: bold; cursor: pointer; }
+    .complete { text-align: center; }
+    .complete svg { width: 56px; height: 56px; color: #1e9e5a; margin-bottom: 12px; }
+    .complete p { font-size: 14px; color: #555; margin: 8px 0 20px; }
+
+    .env-badge { background: #7b3fc4; color: #fff; font-size: 11px; font-weight: bold; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.5px; }
+
+    .footer { text-align: center; font-size: 12px; color: #999; padding: 24px; border-top: 1px solid #e3e6ea; background: #fff; }
+
+    @media (max-width: 600px) {
+      .header-link { display: none; }
+      .hero h1 { font-size: 26px; }
+      .header { padding: 0 16px; }
+      .logo { font-size: 18px; }
+      .env-badge { max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .header-right { gap: 8px; }
+      .cart-btn { padding: 6px 12px; }
+      .main { padding: 24px 16px 48px; }
+      .sale-banner { padding: 0 16px; }
+      .sale-banner-text svg { display: none; }
+      .sale-banner-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      エレホーム
+      <span class="env-badge" id="env-badge">feature/offersBanner</span>
+    </div>
+    <div class="header-right">
+      <a class="header-link" href="#products">商品一覧</a>
+      <a class="header-link" href="#products">ご利用ガイド</a>
+      <button class="cart-btn" id="cart-button" onclick="openCart()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        カート <span class="cart-count" id="cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>暮らしを変える、最新家電。</h1>
+    <p>生活家電からキッチン家電まで、全品送料無料でお届けします。</p>
+  </section>
+
+  <section class="sale-banner" id="sale-banner">
+    <div class="sale-banner-inner">
+      <div class="sale-banner-text">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9.5C10 7 10 4 12 2c2 2 2 5 0 7.5z"/><path d="M14.4 11.2c1.2-3 3.8-4.6 6.5-3.8-.4 2.8-3 4.6-6.5 3.8z"/><path d="M13.5 14.2c3.1.5 5 2.8 4.7 5.6-2.8.2-4.9-2-4.7-5.6z"/><path d="M10.5 14.2c.2 3.6-1.9 5.8-4.7 5.6-.3-2.8 1.6-5.1 4.7-5.6z"/><path d="M9.6 11.2c-3.5.8-6.1-1-6.5-3.8 2.7-.8 5.3.8 6.5 3.8z"/><circle cx="12" cy="12" r="1.2"/></svg>
+        <div>
+          <div class="sale-banner-period">SPRING SALE｜3/1〜4/30</div>
+          <div class="sale-banner-title">新生活応援セール</div>
+          <div class="sale-banner-sub">新生活に欠かせない家電が最大20%OFF。春の期間限定価格です。</div>
+        </div>
+      </div>
+      <button class="sale-banner-btn" id="sale-banner-button" onclick="showSaleItems()">お買い得商品を見る</button>
+    </div>
+  </section>
+
+  <main class="main" id="products">
+    <div class="section-head">
+      <h2 class="section-title" id="section-title">おすすめ商品</h2>
+      <button class="show-all-btn" id="show-all-button" onclick="showAllItems()">すべての商品を表示</button>
+    </div>
+
+    <div class="product-grid" id="product-grid">
+      <div class="product-card" data-product="fridge">
+        <div class="product-img" style="background:#e8f1fb">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0b5cad" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M5 10h14"/><path d="M8 5v2"/><path d="M8 13v3"/></svg>
+        </div>
+        <div class="product-body">
+          <div class="product-category">冷蔵庫</div>
+          <div class="product-name">ひえひえ冷蔵庫 450L</div>
+          <div class="price-row"><span class="price">¥128,000</span></div>
+        </div>
+        <button class="add-cart-btn" onclick="addToCart('fridge')">カートに入れる</button>
+      </div>
+
+      <div class="product-card" data-product="washer">
+        <div class="product-img" style="background:#e9f7f0">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1e9e5a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><path d="M3 6h18"/><circle cx="12" cy="14" r="5"/><path d="M7 4h.01"/><path d="M10 4h.01"/></svg>
+        </div>
+        <div class="product-body">
+          <div class="product-category">洗濯機</div>
+          <div class="product-name">ドラム式洗濯乾燥機 11kg</div>
+          <div class="price-row"><span class="price">¥198,000</span></div>
+        </div>
+        <button class="add-cart-btn" onclick="addToCart('washer')">カートに入れる</button>
+      </div>
+
+      <div class="product-card" data-product="aircon" data-sale="true">
+        <div class="product-img" style="background:#eef4fb">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#1f8ae0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="8" rx="2"/><path d="M6 9h12"/><path d="M7 15c0 2-1 3-1 5"/><path d="M12 15v5"/><path d="M17 15c0 2 1 3 1 5"/></svg>
+          <span class="sale-badge">20%OFF</span>
+        </div>
+        <div class="product-body">
+          <div class="product-category">エアコン</div>
+          <div class="product-name">省エネエアコン 10畳用</div>
+          <div class="price-row"><span class="price on-sale">¥71,800</span><span class="price-original">¥89,800</span></div>
+        </div>
+        <button class="add-cart-btn" onclick="addToCart('aircon')">カートに入れる</button>
+      </div>
+
+      <div class="product-card" data-product="vacuum" data-sale="true">
+        <div class="product-img" style="background:#f6eefc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#7b3fc4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v13"/><path d="M14 15H7a3 3 0 0 0-3 3v1h13v-1a3 3 0 0 0-3-3z"/><circle cx="7" cy="21" r="1"/><circle cx="15" cy="21" r="1"/><path d="M12 2h4"/></svg>
+          <span class="sale-badge">15%OFF</span>
+        </div>
+        <div class="product-body">
+          <div class="product-category">掃除機</div>
+          <div class="product-name">コードレススティック掃除機</div>
+          <div class="price-row"><span class="price on-sale">¥33,800</span><span class="price-original">¥39,800</span></div>
+        </div>
+        <button class="add-cart-btn" onclick="addToCart('vacuum')">カートに入れる</button>
+      </div>
+
+      <div class="product-card" data-product="tv">
+        <div class="product-img" style="background:#eceef1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#39424e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+        </div>
+        <div class="product-body">
+          <div class="product-category">テレビ</div>
+          <div class="product-name">4K有機ELテレビ 55V型</div>
+          <div class="price-row"><span class="price">¥168,000</span></div>
+        </div>
+        <button class="add-cart-btn" onclick="addToCart('tv')">カートに入れる</button>
+      </div>
+
+      <div class="product-card" data-product="microwave" data-sale="true">
+        <div class="product-img" style="background:#fdf1e4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#e07b00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><rect x="5" y="8" width="10" height="8" rx="1"/><path d="M18 9h.01"/><path d="M18 12h.01"/><path d="M18 15h.01"/></svg>
+          <span class="sale-badge">15%OFF</span>
+        </div>
+        <div class="product-body">
+          <div class="product-category">キッチン家電</div>
+          <div class="product-name">スチームオーブンレンジ 30L</div>
+          <div class="price-row"><span class="price on-sale">¥46,800</span><span class="price-original">¥54,800</span></div>
+        </div>
+        <button class="add-cart-btn" onclick="addToCart('microwave')">カートに入れる</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">&copy; 2026 エレホーム（MagicPod ブランチ機能デモ用ダミーサイト）</footer>
+
+  <div class="toast" id="toast"></div>
+  <div class="overlay" id="overlay" onclick="closeAll()"></div>
+
+  <aside class="cart-drawer" id="cart-drawer" aria-label="カート">
+    <div class="drawer-head">
+      <h2>ショッピングカート</h2>
+      <button class="icon-btn" onclick="closeAll()" aria-label="閉じる">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="drawer-foot">
+      <div class="cart-total"><span>合計</span><span id="cart-total">¥0</span></div>
+      <button class="checkout-btn" id="checkout-button" onclick="openCheckout()" disabled>レジに進む</button>
+    </div>
+  </aside>
+
+  <div class="modal" id="checkout-modal" role="dialog" aria-label="ご注文手続き">
+    <div id="checkout-form">
+      <h2>ご注文手続き</h2>
+      <div class="form-row">
+        <label for="customer-name">お名前</label>
+        <input type="text" id="customer-name" placeholder="山田 太郎">
+        <div class="form-error" id="name-error">お名前を入力してください</div>
+      </div>
+      <div class="form-row">
+        <label for="delivery">配送方法</label>
+        <select id="delivery">
+          <option value="standard">通常配送（3〜5日）</option>
+          <option value="express">お急ぎ便（翌日）</option>
+        </select>
+      </div>
+      <div class="summary"><span>お支払い金額</span><strong id="checkout-total">¥0</strong></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeCheckout()">戻る</button>
+        <button class="btn-primary" id="confirm-button" onclick="confirmOrder()">注文を確定する</button>
+      </div>
+    </div>
+    <div class="complete" id="order-complete" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>
+      <h2>ご注文ありがとうございました</h2>
+      <p>注文番号：<span id="order-number"></span></p>
+      <button class="btn-primary" style="width:100%" onclick="finishOrder()">買い物を続ける</button>
+    </div>
+  </div>
+
+  <script>
+    const PRODUCTS = {
+      fridge:    { name: 'ひえひえ冷蔵庫 450L', price: 128000 },
+      washer:    { name: 'ドラム式洗濯乾燥機 11kg', price: 198000 },
+      aircon:    { name: '省エネエアコン 10畳用', price: 71800 },
+      vacuum:    { name: 'コードレススティック掃除機', price: 33800 },
+      tv:        { name: '4K有機ELテレビ 55V型', price: 168000 },
+      microwave: { name: 'スチームオーブンレンジ 30L', price: 46800 }
+    };
+    let cart = {};
+
+    const yen = n => '¥' + n.toLocaleString('ja-JP');
+    const cartTotal = () => Object.entries(cart).reduce((s, [id, q]) => s + PRODUCTS[id].price * q, 0);
+
+    function addToCart(id) {
+      cart[id] = (cart[id] || 0) + 1;
+      renderCart();
+      showToast(PRODUCTS[id].name + ' をカートに入れました');
+    }
+
+    function renderCart() {
+      const count = Object.values(cart).reduce((a, b) => a + b, 0);
+      document.getElementById('cart-count').textContent = count;
+      const items = document.getElementById('cart-items');
+      if (count === 0) {
+        items.innerHTML = '<div class="cart-empty">カートに商品がありません</div>';
+      } else {
+        items.innerHTML = Object.entries(cart).map(([id, q]) =>
+          '<div class="cart-item"><div><div class="cart-item-name">' + PRODUCTS[id].name +
+          '</div><div class="cart-item-meta">数量：' + q + '</div></div><div class="cart-item-price">' +
+          yen(PRODUCTS[id].price * q) + '</div></div>').join('');
+      }
+      document.getElementById('cart-total').textContent = yen(cartTotal());
+      document.getElementById('checkout-button').disabled = count === 0;
+    }
+
+    let toastTimer;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    function openCart() {
+      document.getElementById('overlay').classList.add('open');
+      document.getElementById('cart-drawer').classList.add('open');
+    }
+    function closeAll() {
+      document.getElementById('overlay').classList.remove('open');
+      document.getElementById('cart-drawer').classList.remove('open');
+      document.getElementById('checkout-modal').classList.remove('open');
+    }
+    function openCheckout() {
+      document.getElementById('cart-drawer').classList.remove('open');
+      document.getElementById('checkout-total').textContent = yen(cartTotal());
+      document.getElementById('checkout-form').style.display = '';
+      document.getElementById('order-complete').style.display = 'none';
+      document.getElementById('checkout-modal').classList.add('open');
+    }
+    function closeCheckout() {
+      document.getElementById('checkout-modal').classList.remove('open');
+      openCart();
+    }
+    function confirmOrder() {
+      const name = document.getElementById('customer-name');
+      const err = document.getElementById('name-error');
+      if (!name.value.trim()) { err.style.display = 'block'; return; }
+      err.style.display = 'none';
+      document.getElementById('order-number').textContent = 'EH-' + Date.now().toString().slice(-8);
+      document.getElementById('checkout-form').style.display = 'none';
+      document.getElementById('order-complete').style.display = '';
+    }
+    function finishOrder() {
+      cart = {};
+      document.getElementById('customer-name').value = '';
+      renderCart();
+      closeAll();
+    }
+
+    function showSaleItems() {
+      document.querySelectorAll('.product-card').forEach(c => c.classList.toggle('hidden', c.dataset.sale !== 'true'));
+      document.getElementById('section-title').textContent = 'お買い得商品';
+      document.getElementById('show-all-button').style.display = 'inline';
+      document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+    }
+    function showAllItems() {
+      document.querySelectorAll('.product-card').forEach(c => c.classList.remove('hidden'));
+      document.getElementById('section-title').textContent = 'おすすめ商品';
+      document.getElementById('show-all-button').style.display = 'none';
+    }
+
+    renderCart();
+  </script>
+</body>
+</html>

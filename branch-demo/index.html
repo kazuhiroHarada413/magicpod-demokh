@@ -33,39 +33,47 @@
       <div class="env">
         <h3>本番（ステージング）</h3>
         <p><a href="staging/">staging/</a></p>
-        <p class="note">ステージング環境と本番環境はミラーの想定。MagicPodの「本番用ブランチ」で使用。</p>
+        <p class="note">ステージング環境と本番環境はミラーの想定。MagicPodの本番用ブランチで使用。</p>
       </div>
       <div class="env">
         <h3>開発</h3>
         <p><a href="develop/">develop/</a></p>
-        <p class="note">機能追加済みの開発環境。MagicPodの「デフォルトブランチ（開発）」で使用。</p>
+        <p class="note">①②の両方が入った開発環境（デモの都合上、完成状態）。MagicPodのデフォルトブランチで使用。</p>
+      </div>
+      <div class="env">
+        <h3>feature/RenameButton</h3>
+        <p><a href="feature-rename-button/">feature-rename-button/</a></p>
+        <p class="note">staging に①ボタン名称変更だけを入れたプレビュー環境。</p>
+      </div>
+      <div class="env">
+        <h3>feature/offersBanner</h3>
+        <p><a href="feature-offers-banner/">feature-offers-banner/</a></p>
+        <p class="note">staging に②お買い得バナーだけを入れたプレビュー環境。</p>
       </div>
     </div>
-    <p class="note">パスは同一（<code>index.html</code>）なので、テスト設定のベースURLを <code>…/branch-demo/staging/</code> と <code>…/branch-demo/develop/</code> で切り替えるだけで環境を変更できます。</p>
+    <p class="note">パスはすべて同一（<code>index.html</code>）なので、テスト設定のベースURLを <code>…/branch-demo/&lt;環境&gt;</code> で切り替えるだけで環境を変更できます。</p>
 
-    <h2>2環境の差分</h2>
+    <h2>環境ごとの差分</h2>
     <table>
-      <tr><th>項目</th><th>staging（本番）</th><th>develop（開発）</th><th>対応する機能ブランチ</th></tr>
-      <tr><td>商品カードのボタン</td><td>カートに入れる</td><td>カートに追加</td><td rowspan="3">機能ブランチ①<br>ボタン名称変更</td></tr>
-      <tr><td>追加時のトースト</td><td>〇〇 をカートに入れました</td><td>〇〇 をカートに追加しました</td></tr>
-      <tr><td>カート内のボタン</td><td>レジに進む</td><td>購入手続きへ</td></tr>
-      <tr><td>お買い得バナー</td><td>なし</td><td>「新生活応援セール」（春の期間限定）＋「お買い得商品を見る」ボタン（押すとセール品のみ表示）</td><td rowspan="2">機能ブランチ②<br>お買い得バナー</td></tr>
-      <tr><td>セール価格</td><td>エアコン ¥89,800 / 掃除機 ¥39,800 / レンジ ¥54,800</td><td>エアコン ¥71,800 / 掃除機 ¥33,800 / レンジ ¥46,800</td></tr>
-      <tr><td>環境バッジ</td><td>なし</td><td>ヘッダーに「DEVELOP」</td><td>（目印用）</td></tr>
+      <tr><th>項目</th><th>staging</th><th>feature-rename-button</th><th>feature-offers-banner</th><th>develop</th></tr>
+      <tr><td>商品カードのボタン</td><td>カートに入れる</td><td>カートに追加</td><td>カートに入れる</td><td>カートに追加</td></tr>
+      <tr><td>追加時のトースト</td><td>〇〇 をカートに入れました</td><td>〇〇 をカートに追加しました</td><td>〇〇 をカートに入れました</td><td>〇〇 をカートに追加しました</td></tr>
+      <tr><td>カート内のボタン</td><td>レジに進む</td><td>購入手続きへ</td><td>レジに進む</td><td>購入手続きへ</td></tr>
+      <tr><td>新生活応援セールバナー</td><td>なし</td><td>なし</td><td>あり</td><td>あり</td></tr>
+      <tr><td>セール価格（エアコン / 掃除機 / レンジ）</td><td>¥89,800 / ¥39,800 / ¥54,800</td><td>¥89,800 / ¥39,800 / ¥54,800</td><td>¥71,800 / ¥33,800 / ¥46,800</td><td>¥71,800 / ¥33,800 / ¥46,800</td></tr>
+      <tr><td>環境バッジ</td><td>なし</td><td>feature/RenameButton</td><td>feature/offersBanner</td><td>DEVELOP</td></tr>
     </table>
-    <p class="note">冷蔵庫・洗濯機・テレビは両環境で同価格です。購入フローのテストはこれらの商品を使うと、機能ブランチ①の差分だけで説明できます。</p>
+    <p class="note">冷蔵庫・洗濯機・テレビはすべての環境で同価格です。</p>
 
     <h2>デモの流れ</h2>
     <ol>
-      <li><strong>準備</strong>：staging に対して購入フローのテストを作成（例：冷蔵庫を「カートに入れる」→ カートを開く →「レジに進む」→ お名前入力 →「注文を確定する」→「ご注文ありがとうございました」を確認）。</li>
-      <li>同じテストを develop のベースURLで実行 → ボタン名称が違うため<strong>失敗</strong>する。1本のテストで両環境を回せないことを示す。</li>
-      <li>現在の状態から<strong>本番用ブランチ</strong>（例：<code>production</code>）を作成し、staging のベースURLを使うテスト設定を紐づける。</li>
-      <li><strong>デフォルトブランチを開発ブランチ</strong>として扱い、develop のベースURLを使う設定にする。</li>
-      <li>デフォルトブランチから<strong>機能ブランチ①</strong>（例：<code>feature/button-rename</code>）を作成し、「カートに追加」「購入手続きへ」に合わせてテストを修正 → develop で成功。</li>
-      <li>デフォルトブランチから<strong>機能ブランチ②</strong>（例：<code>feature/sale-banner</code>）を作成し、お買い得バナーのテストを追加（バナー表示の確認 →「お買い得商品を見る」→ 見出し「お買い得商品」とセール品のみ表示を確認）→ develop で成功。</li>
-      <li>①②をデフォルトブランチへ<strong>マージ</strong> → develop で全テスト成功。本番用ブランチは staging で引き続き成功し、開発の進行とテストのブランチが連動することを示す。</li>
+      <li><strong>準備</strong>：本番用ブランチ（staging）とデフォルトブランチ（develop）を用意。デフォルトブランチから <code>feature/RenameButton</code> と <code>feature/offersBanner</code> を作成する。</li>
+      <li><strong>Aさん</strong>：<code>feature/RenameButton</code> でボタン名称（カートに追加 / 購入手続きへ）に合わせてテストを修正 → feature-rename-button 環境で成功 → コードとテストをデフォルトブランチへマージ（コンフリクトなし）。</li>
+      <li><strong>Bさん</strong>：<code>feature/offersBanner</code> でバナーとセール価格のテストを追加 → feature-offers-banner 環境で成功。</li>
+      <li>Bさんがデフォルトブランチへマージしようとすると、Aさんの変更と同じ商品カード部分を編集しているため<strong>コンフリクト</strong>が発生。マージ画面で両方の変更を残して解消する。</li>
+      <li>マージ後のデフォルトブランチを develop で実行 → 成功。本番用ブランチは staging で引き続き成功する。</li>
     </ol>
-    <p class="note">マージ時のコンフリクトを避けたい場合、機能ブランチ②は既存の購入フローのテストを編集せず、別のテストケースとして追加してください。</p>
+    <p class="note">本来はデフォルトブランチの変更を取り込んだ状態で機能ブランチのテストを再実行するが、デモでは develop に全機能が入っているため、マージ後に develop で確認する形で省略する。</p>
   </div>
 </body>
 </html>
