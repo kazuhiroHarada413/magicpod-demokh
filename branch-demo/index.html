@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ブランチ機能デモ</title>
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; color: #333; }
+    .container { max-width: 860px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    h1 { margin-top: 0; }
+    h2 { color: #555; margin-top: 32px; border-bottom: 2px solid #007bff; padding-bottom: 8px; }
+    a { color: #007bff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .envs { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+    .env { border: 1px solid #ddd; border-radius: 8px; padding: 16px; }
+    .env h3 { margin: 0 0 8px; font-size: 16px; }
+    .env code { font-size: 13px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    th, td { border: 1px solid #ddd; padding: 8px 10px; text-align: left; vertical-align: top; }
+    th { background: #f0f4f8; }
+    ol li { margin: 8px 0; line-height: 1.6; }
+    code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; }
+    .note { font-size: 13px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ブランチ機能デモ（家電EC：エレホーム）</h1>
+    <p><a href="../index.html">&larr; デモ一覧に戻る</a></p>
+
+    <h2>環境</h2>
+    <div class="envs">
+      <div class="env">
+        <h3>本番（ステージング）</h3>
+        <p><a href="staging/">staging/</a></p>
+        <p class="note">ステージング環境と本番環境はミラーの想定。MagicPodの「本番用ブランチ」で使用。</p>
+      </div>
+      <div class="env">
+        <h3>開発</h3>
+        <p><a href="develop/">develop/</a></p>
+        <p class="note">機能追加済みの開発環境。MagicPodの「デフォルトブランチ（開発）」で使用。</p>
+      </div>
+    </div>
+    <p class="note">パスは同一（<code>index.html</code>）なので、テスト設定のベースURLを <code>…/branch-demo/staging/</code> と <code>…/branch-demo/develop/</code> で切り替えるだけで環境を変更できます。</p>
+
+    <h2>2環境の差分</h2>
+    <table>
+      <tr><th>項目</th><th>staging（本番）</th><th>develop（開発）</th><th>対応する機能ブランチ</th></tr>
+      <tr><td>商品カードのボタン</td><td>カートに入れる</td><td>カートに追加</td><td rowspan="3">機能ブランチ①<br>ボタン名称変更</td></tr>
+      <tr><td>追加時のトースト</td><td>〇〇 をカートに入れました</td><td>〇〇 をカートに追加しました</td></tr>
+      <tr><td>カート内のボタン</td><td>レジに進む</td><td>購入手続きへ</td></tr>
+      <tr><td>お買い得バナー</td><td>なし</td><td>「本日のお買い得」＋「お買い得商品を見る」ボタン（押すとセール品のみ表示）</td><td rowspan="2">機能ブランチ②<br>お買い得バナー</td></tr>
+      <tr><td>セール価格</td><td>エアコン ¥89,800 / 掃除機 ¥39,800 / レンジ ¥54,800</td><td>エアコン ¥71,800 / 掃除機 ¥33,800 / レンジ ¥46,800</td></tr>
+      <tr><td>環境バッジ</td><td>なし</td><td>ヘッダーに「DEVELOP」</td><td>（目印用）</td></tr>
+    </table>
+    <p class="note">冷蔵庫・洗濯機・テレビは両環境で同価格です。購入フローのテストはこれらの商品を使うと、機能ブランチ①の差分だけで説明できます。</p>
+
+    <h2>デモの流れ</h2>
+    <ol>
+      <li><strong>準備</strong>：staging に対して購入フローのテストを作成（例：冷蔵庫を「カートに入れる」→ カートを開く →「レジに進む」→ お名前入力 →「注文を確定する」→「ご注文ありがとうございました」を確認）。</li>
+      <li>同じテストを develop のベースURLで実行 → ボタン名称が違うため<strong>失敗</strong>する。1本のテストで両環境を回せないことを示す。</li>
+      <li>現在の状態から<strong>本番用ブランチ</strong>（例：<code>production</code>）を作成し、staging のベースURLを使うテスト設定を紐づける。</li>
+      <li><strong>デフォルトブランチを開発ブランチ</strong>として扱い、develop のベースURLを使う設定にする。</li>
+      <li>デフォルトブランチから<strong>機能ブランチ①</strong>（例：<code>feature/button-rename</code>）を作成し、「カートに追加」「購入手続きへ」に合わせてテストを修正 → develop で成功。</li>
+      <li>デフォルトブランチから<strong>機能ブランチ②</strong>（例：<code>feature/sale-banner</code>）を作成し、お買い得バナーのテストを追加（バナー表示の確認 →「お買い得商品を見る」→ 見出し「お買い得商品」とセール品のみ表示を確認）→ develop で成功。</li>
+      <li>①②をデフォルトブランチへ<strong>マージ</strong> → develop で全テスト成功。本番用ブランチは staging で引き続き成功し、開発の進行とテストのブランチが連動することを示す。</li>
+    </ol>
+    <p class="note">マージ時のコンフリクトを避けたい場合、機能ブランチ②は既存の購入フローのテストを編集せず、別のテストケースとして追加してください。</p>
+  </div>
+</body>
+</html>
