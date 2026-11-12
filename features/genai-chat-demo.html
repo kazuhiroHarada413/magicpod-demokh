@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>デモストア サポートチャット</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --panel: #ffffff;
+    --text: #1f2933;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --user: #2563eb;
+    --user-text: #ffffff;
+    --bot: #eef1f5;
+    --border: #dde1e7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Segoe UI", sans-serif;
+    font-size: 15px;
+  }
+  .app {
+    max-width: 720px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  header .logo {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--accent); color: #fff;
+    display: grid; place-items: center; font-weight: 700;
+  }
+  header h1 { font-size: 18px; margin: 0; }
+  header p { margin: 0; color: var(--muted); font-size: 13px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  #messages {
+    height: 460px;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .message {
+    max-width: 85%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .message.user {
+    align-self: flex-end;
+    background: var(--user);
+    color: var(--user-text);
+    border-bottom-right-radius: 4px;
+  }
+  .message.bot {
+    align-self: flex-start;
+    background: var(--bot);
+    border-bottom-left-radius: 4px;
+  }
+  .message.typing { color: var(--muted); font-style: italic; }
+  form {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+  }
+  #prompt-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  #send-button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  #send-button:disabled { opacity: 0.5; cursor: default; }
+  #status {
+    padding: 0 12px 12px;
+    color: var(--muted);
+    font-size: 13px;
+    min-height: 1.5em;
+  }
+  footer { margin-top: 10px; color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">D</div>
+    <div>
+      <h1>デモストア サポートチャット</h1>
+      <p>AI アシスタントがご質問にお答えします</p>
+    </div>
+  </header>
+
+  <div class="panel">
+    <div id="messages" aria-live="polite">
+      <div class="message bot">こんにちは。デモストアの AI アシスタントです。商品やご注文について、お気軽にご質問ください。</div>
+    </div>
+    <form id="chat-form" autocomplete="off">
+      <input id="prompt-input" name="prompt" type="text" placeholder="質問を入力してください" aria-label="質問">
+      <button id="send-button" type="submit">送信</button>
+    </form>
+    <div id="status" data-state="idle"></div>
+  </div>
+
+  <footer>
+    ※ MagicPod のセミナー用のデモ画面です。実在のお店・サービスではありません。回答は生成 AI ではなく、あらかじめ用意した文からランダムに選んでいます。
+  </footer>
+</div>
+
+<script>
+  // 質問のキーワードごとに、回答の候補を用意する。
+  // 言い回しを毎回変えて、生成 AI の「答えが一定しない」状態を再現する。
+  const RULES = [
+    {
+      // わざと的外れな回答を返す（AIアサーションが失敗することを見せるため）
+      keywords: ["配送料", "送料"],
+      answers: [
+        "ただいまポイント2倍キャンペーンを実施中です。会員登録をすると、次回のお買い物で使えるクーポンもお届けします。",
+        "店舗の営業時間は毎日9時から20時までです。年末年始は営業時間が変わる場合があります。",
+        "新商品の観葉植物コーナーが公開されました。ぜひトップページからご覧ください。"
+      ]
+    },
+    {
+      keywords: ["土", "観葉植物", "用土"],
+      answers: [
+        "観葉植物には、水はけと通気性のよい「観葉植物用の培養土」がおすすめです。赤玉土や鹿沼土が配合されたものを選ぶと、根腐れしにくくなります。",
+        "観葉植物を育てるなら、水はけのよい専用の培養土を選びましょう。室内で使う場合は、虫がわきにくい有機質の少ないタイプが向いています。",
+        "おすすめは観葉植物向けの培養土です。通気性と水はけを重視して作られているため、初めての方でも根腐れを防ぎやすいです。小さな鉢には細かい粒のものが使いやすいです。"
+      ]
+    },
+    {
+      keywords: ["返品", "返金", "交換"],
+      answers: [
+        "返品のお手続きは次のとおりです。\n1. マイページの「注文履歴」から該当の注文を開きます\n2. 「返品を申し込む」を選び、理由を入力します\n3. 届いた案内に沿って商品を発送してください\n返金額は商品の状態を確認したうえでご案内します。",
+        "返品をご希望の場合は、商品到着から30日以内にマイページの注文履歴からお申し込みください。返送方法をメールでご案内します。返金額は、商品を確認したあとにお知らせします。",
+        "ご不便をおかけしております。返品は、マイページの「注文履歴」→「返品を申し込む」から受け付けています。商品の状態によって返金額が変わるため、確認後に改めてご連絡します。"
+      ]
+    }
+  ];
+
+  const FALLBACK = [
+    "ご質問ありがとうございます。商品・ご注文・配送について、もう少し詳しく教えていただけますか。",
+    "申し訳ありません、うまく理解できませんでした。別の言い方でもう一度お試しください。"
+  ];
+
+  const messages = document.getElementById("messages");
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("prompt-input");
+  const button = document.getElementById("send-button");
+  const status = document.getElementById("status");
+
+  function pick(list) {
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function chooseAnswer(text) {
+    const rule = RULES.find(r => r.keywords.some(k => text.includes(k)));
+    return pick(rule ? rule.answers : FALLBACK);
+  }
+
+  function addMessage(text, role) {
+    const el = document.createElement("div");
+    el.className = "message " + role;
+    el.textContent = text;
+    messages.appendChild(el);
+    messages.scrollTop = messages.scrollHeight;
+    return el;
+  }
+
+  function setStatus(state, text) {
+    status.dataset.state = state;
+    status.textContent = text;
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user");
+    input.value = "";
+    input.disabled = true;
+    button.disabled = true;
+    setStatus("answering", "回答を作成しています…");
+
+    const typing = addMessage("入力中…", "bot typing");
+    // 生成 AI らしく、回答までに少し時間がかかるようにする（1〜2.5秒）
+    const delay = 1000 + Math.random() * 1500;
+    setTimeout(() => {
+      typing.remove();
+      const answer = addMessage(chooseAnswer(text), "bot");
+      answer.classList.add("latest");
+      document.querySelectorAll(".message.bot.latest").forEach(el => {
+        if (el !== answer) el.classList.remove("latest");
+      });
+      input.disabled = false;
+      button.disabled = false;
+      input.focus();
+      setStatus("done", "回答が完了しました");
+    }, delay);
+  });
+</script>
+</body>
+</html>
