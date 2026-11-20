@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>デモストア 商品詳細</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --panel: #ffffff;
+    --text: #1f2933;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --border: #dde1e7;
+    --ok: #15803d;
+    --ng: #b91c1c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Segoe UI", sans-serif;
+    font-size: 15px;
+  }
+  .app { max-width: 720px; margin: 24px auto; padding: 0 16px; }
+  header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  header .logo {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--accent); color: #fff;
+    display: grid; place-items: center; font-weight: 700;
+  }
+  header h1 { font-size: 18px; margin: 0; }
+  header p { margin: 0; color: var(--muted); font-size: 13px; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  #status { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+  #status[data-state="done"] { color: var(--ok); }
+  #status[data-state="error"] { color: var(--ng); }
+  #product { display: none; }
+  #product[data-loaded="true"] { display: block; }
+  .category {
+    display: inline-block; font-size: 12px; color: var(--accent);
+    background: #e8efff; border-radius: 999px; padding: 2px 10px;
+  }
+  #product-name { font-size: 22px; margin: 10px 0 6px; }
+  #product-price { font-size: 20px; font-weight: 700; margin: 0 0 12px; }
+  dl { display: grid; grid-template-columns: 90px 1fr; gap: 6px 12px; margin: 0; font-size: 14px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; }
+  footer { margin-top: 10px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+  code { background: #eef1f5; padding: 1px 4px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">D</div>
+    <div>
+      <h1>デモストア 商品詳細</h1>
+      <p>テストデータとして登録した商品を表示します</p>
+    </div>
+  </header>
+
+  <div class="panel">
+    <div id="status" data-state="loading">読み込み中…</div>
+    <div id="product" data-loaded="false">
+      <span id="product-category" class="category"></span>
+      <h2 id="product-name"></h2>
+      <p id="product-price"></p>
+      <dl>
+        <dt>在庫</dt><dd id="product-stock"></dd>
+        <dt>商品 ID</dt><dd id="product-id"></dd>
+      </dl>
+    </div>
+  </div>
+
+  <footer>
+    ※ MagicPod のセミナー用のデモ画面です。実在のお店・商品ではありません。<br>
+    商品データは無料のテスト用 API（restful-api.dev）から読み込みます。URL の <code>?id=</code> に、登録したデータの ID を付けて開きます。
+  </footer>
+</div>
+
+<script>
+  const API = "https://api.restful-api.dev/objects/";
+  const status = document.getElementById("status");
+  const box = document.getElementById("product");
+
+  function setStatus(state, text) {
+    status.dataset.state = state;
+    status.textContent = text;
+  }
+
+  const id = new URLSearchParams(location.search).get("id");
+  if (!id) {
+    setStatus("error", "URL に ?id= を付けて開いてください");
+  } else {
+    fetch(API + encodeURIComponent(id))
+      .then(res => res.ok ? res.json() : Promise.reject(res.status))
+      .then(item => {
+        const d = item.data || {};
+        document.getElementById("product-name").textContent = item.name || "";
+        document.getElementById("product-category").textContent = d.category || "その他";
+        document.getElementById("product-price").textContent =
+          d.price != null ? "¥" + Number(d.price).toLocaleString("ja-JP") : "価格未設定";
+        document.getElementById("product-stock").textContent = d.stock != null ? d.stock + " 点" : "―";
+        document.getElementById("product-id").textContent = item.id;
+        box.dataset.loaded = "true";
+        setStatus("done", "商品を表示しました");
+      })
+      .catch(() => setStatus("error", "商品が見つかりません"));
+  }
+</script>
+</body>
+</html>
