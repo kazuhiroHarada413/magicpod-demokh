@@ -149,9 +149,10 @@
     {
       keywords: ["土", "観葉植物", "用土"],
       answers: [
-        "観葉植物には、水はけと通気性のよい「観葉植物用の培養土」がおすすめです。赤玉土や鹿沼土が配合されたものを選ぶと、根腐れしにくくなります。",
-        "観葉植物を育てるなら、水はけのよい専用の培養土を選びましょう。室内で使う場合は、虫がわきにくい有機質の少ないタイプが向いています。",
-        "おすすめは観葉植物向けの培養土です。通気性と水はけを重視して作られているため、初めての方でも根腐れを防ぎやすいです。小さな鉢には細かい粒のものが使いやすいです。"
+        // 3つとも中身（専用の培養土・水はけ・根腐れ防止）は同じで、言い回しだけ変えている
+        "観葉植物には、水はけのよい「観葉植物用の培養土」がおすすめです。水がたまりにくいので、根腐れを防げます。",
+        "観葉植物を育てるなら、専用の培養土を選びましょう。水はけがよく作られているため、根腐れしにくくなります。",
+        "おすすめは観葉植物向けの培養土です。水はけを重視して作られていて、根が腐る心配が少なくなります。"
       ]
     },
     {
@@ -175,8 +176,14 @@
   const button = document.getElementById("send-button");
   const status = document.getElementById("status");
 
+  // 直前に返した回答は選ばない（同じ質問を2回したとき、必ず言い回しが変わるようにする）
+  let lastAnswer = null;
+
   function pick(list) {
-    return list[Math.floor(Math.random() * list.length)];
+    const candidates = list.length > 1 ? list.filter(a => a !== lastAnswer) : list;
+    const answer = candidates[Math.floor(Math.random() * candidates.length)];
+    lastAnswer = answer;
+    return answer;
   }
 
   function chooseAnswer(text) {
